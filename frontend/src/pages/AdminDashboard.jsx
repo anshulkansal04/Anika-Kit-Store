@@ -34,7 +34,7 @@ const AdminDashboard = () => {
     price: '',
     categoryId: '',
     tag: '',
-    image: null,
+    images: [],
     featured: false
   });
   const [categoryFormData, setCategoryFormData] = useState({
@@ -108,15 +108,29 @@ const AdminDashboard = () => {
   const handleAddProduct = async (e) => {
     e.preventDefault();
     
+    // Validate that at least one image is selected
+    if (!formData.images || formData.images.length === 0) {
+      setError('Please select at least one product image');
+      return;
+    }
+    
     const form = new FormData();
     form.append('name', formData.name);
     form.append('description', formData.description);
     form.append('price', formData.price);
     form.append('tag', formData.tag);
     form.append('featured', formData.featured);
-    if (formData.image) {
-      form.append('image', formData.image);
+    if (formData.categoryId) {
+      form.append('categoryId', formData.categoryId);
     }
+    
+    // Append multiple images
+    formData.images.forEach((image, index) => {
+      form.append('images', image);
+      if (index === 0) {
+        form.append('mainImageIndex', '0'); // Mark first image as main
+      }
+    });
 
     try {
       const response = await productService.createProduct(form);
@@ -170,8 +184,18 @@ const AdminDashboard = () => {
     form.append('price', formData.price);
     form.append('tag', formData.tag);
     form.append('featured', formData.featured);
-    if (formData.image) {
-      form.append('image', formData.image);
+    if (formData.categoryId) {
+      form.append('categoryId', formData.categoryId);
+    }
+    
+    // Append multiple images if provided
+    if (formData.images && formData.images.length > 0) {
+      formData.images.forEach((image, index) => {
+        form.append('images', image);
+        if (index === 0) {
+          form.append('mainImageIndex', '0'); // Mark first image as main
+        }
+      });
     }
 
     try {
@@ -262,7 +286,7 @@ const AdminDashboard = () => {
       price: '',
       categoryId: '',
       tag: '',
-      image: null,
+      images: [],
       featured: false
     });
   };
@@ -291,7 +315,7 @@ const AdminDashboard = () => {
       price: product.price,
       categoryId: matchingCategory ? matchingCategory._id : '',
       tag: product.tag,
-      image: null,
+      images: [], // Reset images for editing - user will need to upload new ones
       featured: product.featured
     });
     setShowAddForm(true);
@@ -740,14 +764,41 @@ const AdminDashboard = () => {
                     </div>
 
                     <div>
-                      <label className="block text-sm font-medium text-gray-700">Product Image</label>
+                      <label className="block text-sm font-medium text-gray-700">Product Images *</label>
                       <input
                         type="file"
                         accept="image/*"
-                        required={!editingProduct}
-                        onChange={(e) => setFormData({...formData, image: e.target.files[0]})}
+                        multiple
+                        required={!editingProduct && formData.images.length === 0}
+                        onChange={(e) => setFormData({...formData, images: Array.from(e.target.files)})}
                         className="mt-1 block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
                       />
+                      <p className="mt-1 text-sm text-gray-500">
+                        Select multiple images. First image will be the main image.
+                      </p>
+                      {formData.images.length > 0 && (
+                        <div className="mt-2">
+                          <p className="text-sm text-gray-600">
+                            Selected: {formData.images.length} image{formData.images.length !== 1 ? 's' : ''}
+                          </p>
+                          <div className="flex flex-wrap gap-2 mt-2">
+                            {Array.from(formData.images).map((file, index) => (
+                              <div key={index} className="relative">
+                                <img
+                                  src={URL.createObjectURL(file)}
+                                  alt={`Preview ${index + 1}`}
+                                  className="w-16 h-16 object-cover rounded border"
+                                />
+                                {index === 0 && (
+                                  <span className="absolute -top-1 -right-1 bg-blue-500 text-white text-xs px-1 rounded">
+                                    Main
+                                  </span>
+                                )}
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
                     </div>
                   </div>
 

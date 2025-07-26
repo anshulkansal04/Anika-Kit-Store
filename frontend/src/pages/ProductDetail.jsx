@@ -3,6 +3,7 @@ import { useParams, Link, useNavigate } from 'react-router-dom';
 import { productService } from '../services/productService';
 import { categoryService } from '../services/categoryService';
 import Loading from '../components/Loading';
+import Footer from '../components/Footer';
 import { 
   HeartIcon,
   ShareIcon,
@@ -348,6 +349,9 @@ const ProductDetail = () => {
           </div>
         )}
       </main>
+
+      {/* Footer */}
+      <Footer />
     </div>
   );
 };

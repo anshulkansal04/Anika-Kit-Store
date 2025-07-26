@@ -27,6 +27,11 @@ export const productService = {
     return response.data;
   },
 
+  getProductsByCategory: async (categoryId, params = {}) => {
+    const response = await productAPI.get(`/category/${categoryId}`, { params });
+    return response.data;
+  },
+
   getProductsByTag: async (tag, params = {}) => {
     const response = await productAPI.get(`/tag/${tag}`, { params });
     return response.data;

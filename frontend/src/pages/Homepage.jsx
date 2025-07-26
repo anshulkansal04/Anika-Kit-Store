@@ -4,6 +4,7 @@ import { categoryService } from '../services/categoryService';
 import { productService } from '../services/productService';
 import SearchBar from '../components/SearchBar';
 import Loading from '../components/Loading';
+import Footer from '../components/Footer';
 
 const CategoryCard = ({ category }) => {
   return (
@@ -238,8 +239,7 @@ const Homepage = () => {
           </div>
         )}
 
-        {/* Featured Section - Only show when not searching */}
-        {!searchResults && categories.length > 0 && (
+        {/* {!searchResults && categories.length > 0 && (
           <div className="mt-16 bg-blue-50 rounded-2xl p-8">
             <div className="text-center">
               <h3 className="text-2xl font-bold text-gray-900 mb-4">
@@ -266,8 +266,11 @@ const Homepage = () => {
               </div>
             </div>
           </div>
-        )}
+        )} */}
       </main>
+
+      {/* Footer */}
+      <Footer />
     </div>
   );
 };

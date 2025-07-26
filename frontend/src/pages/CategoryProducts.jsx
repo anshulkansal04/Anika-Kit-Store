@@ -3,6 +3,7 @@ import { useParams, Link, useNavigate } from 'react-router-dom';
 import { categoryService } from '../services/categoryService';
 import { productService } from '../services/productService';
 import Loading from '../components/Loading';
+import Footer from '../components/Footer';
 
 const ProductCard = ({ product }) => {
   return (
@@ -86,10 +87,8 @@ const CategoryProducts = () => {
       if (categoryResponse.success) {
         setCategory(categoryResponse.data.category);
         
-        // Then fetch products for this category
-        // For now, we'll use the category name as tag for filtering
-        const categoryName = categoryResponse.data.category.name.toLowerCase().replace(/\s+/g, '-');
-        const productsResponse = await productService.getProductsByTag(categoryName, { page, limit: 12 });
+        // Then fetch products for this category using the proper category-based API
+        const productsResponse = await productService.getProductsByCategory(identifier, { page, limit: 12 });
         if (productsResponse.success) {
           setProducts(productsResponse.data.products);
           setPagination(productsResponse.data.pagination);
@@ -139,9 +138,8 @@ const CategoryProducts = () => {
       if (isLegacyRoute) {
         response = await productService.getProductsByTag(identifier, { page: nextPage, limit: 12 });
       } else {
-        // Use category name as tag for filtering
-        const categoryName = category.name.toLowerCase().replace(/\s+/g, '-');
-        response = await productService.getProductsByTag(categoryName, { page: nextPage, limit: 12 });
+        // Use proper category-based API
+        response = await productService.getProductsByCategory(identifier, { page: nextPage, limit: 12 });
       }
       
       if (response.success) {
@@ -260,6 +258,9 @@ const CategoryProducts = () => {
           </div>
         )}
       </main>
+
+      {/* Footer */}
+      <Footer />
     </div>
   );
 };

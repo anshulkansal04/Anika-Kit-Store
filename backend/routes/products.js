@@ -102,7 +102,64 @@ router.get('/', [
   }
 });
 
-// Get products by tag (public route)
+// Get products by category (public route)
+router.get('/category/:categoryId', [
+  query('page').optional().isInt({ min: 1 }),
+  query('limit').optional().isInt({ min: 1, max: 50 })
+], async (req, res) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid query parameters',
+        errors: errors.array()
+      });
+    }
+
+    const { categoryId } = req.params;
+    const { page = 1, limit = 12 } = req.query;
+
+    const skip = (parseInt(page) - 1) * parseInt(limit);
+
+    const products = await Product.find({
+      categories: categoryId,
+      isActive: true
+    })
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(parseInt(limit))
+      .select('-__v');
+
+    const total = await Product.countDocuments({
+      categories: categoryId,
+      isActive: true
+    });
+
+    res.json({
+      success: true,
+      data: {
+        products,
+        categoryId,
+        pagination: {
+          current: parseInt(page),
+          pages: Math.ceil(total / parseInt(limit)),
+          total,
+          limit: parseInt(limit)
+        }
+      }
+    });
+
+  } catch (error) {
+    console.error('Get products by category error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Internal server error'
+    });
+  }
+});
+
+// Get products by tag (public route - legacy support)
 router.get('/tag/:tagName', [
   query('page').optional().isInt({ min: 1 }),
   query('limit').optional().isInt({ min: 1, max: 50 })
@@ -226,7 +283,7 @@ router.get('/:id', async (req, res) => {
 });
 
 // Create product (admin only)
-router.post('/', authenticateToken, upload.single('image'), [
+router.post('/', authenticateToken, upload.array('images', 5), [
   body('name').trim().isLength({ min: 1, max: 100 }),
   body('description').trim().isLength({ min: 1, max: 1000 }),
   body('price').isFloat({ min: 0 }),
@@ -243,25 +300,38 @@ router.post('/', authenticateToken, upload.single('image'), [
       });
     }
 
-    if (!req.file) {
+    if (!req.files || req.files.length === 0) {
       return res.status(400).json({
         success: false,
-        message: 'Product image is required'
+        message: 'At least one product image is required'
       });
     }
 
-    const { name, description, price, categoryId, tag, featured = false } = req.body;
+    const { name, description, price, categoryId, tag, featured = false, mainImageIndex = 0 } = req.body;
 
     // Build product data
     const productData = {
       name,
       description,
       price: parseFloat(price),
-      image: {
-        url: req.file.path,
-        publicId: req.file.filename
-      },
       featured: featured === 'true'
+    };
+
+    // Handle images
+    const images = req.files.map((file, index) => ({
+      url: file.path,
+      publicId: file.filename,
+      alt: `${name} - Image ${index + 1}`,
+      isMain: index === parseInt(mainImageIndex)
+    }));
+
+    productData.images = images;
+    
+    // Keep legacy image field for backward compatibility (use main image)
+    const mainImage = req.files[parseInt(mainImageIndex)] || req.files[0];
+    productData.image = {
+      url: mainImage.path,
+      publicId: mainImage.filename
     };
 
     // Handle categories - prefer categoryId over tag
@@ -291,6 +361,18 @@ router.post('/', authenticateToken, upload.single('image'), [
 
     await product.save();
 
+    // Update category product count if product has categories
+    if (product.categories && product.categories.length > 0) {
+      const Category = require('../models/Category');
+      for (const categoryId of product.categories) {
+        const productCount = await Product.countDocuments({ 
+          categories: categoryId, 
+          isActive: true 
+        });
+        await Category.findByIdAndUpdate(categoryId, { productCount });
+      }
+    }
+
     res.status(201).json({
       success: true,
       message: 'Product created successfully',
@@ -300,12 +382,14 @@ router.post('/', authenticateToken, upload.single('image'), [
   } catch (error) {
     console.error('Create product error:', error);
     
-    // Delete uploaded image if product creation fails
-    if (req.file) {
-      try {
-        await deleteImage(req.file.filename);
-      } catch (deleteError) {
-        console.error('Error deleting image after failed product creation:', deleteError);
+    // Delete uploaded images if product creation fails
+    if (req.files && req.files.length > 0) {
+      for (const file of req.files) {
+        try {
+          await deleteImage(file.filename);
+        } catch (deleteError) {
+          console.error('Error deleting image after failed product creation:', deleteError);
+        }
       }
     }
 
@@ -325,7 +409,7 @@ router.post('/', authenticateToken, upload.single('image'), [
 });
 
 // Update product (admin only)
-router.put('/:id', authenticateToken, upload.single('image'), [
+router.put('/:id', authenticateToken, upload.array('images', 5), [
   body('name').optional().trim().isLength({ min: 1, max: 100 }),
   body('description').optional().trim().isLength({ min: 1, max: 1000 }),
   body('price').optional().isFloat({ min: 0 }),
@@ -350,8 +434,9 @@ router.put('/:id', authenticateToken, upload.single('image'), [
       });
     }
 
-    const { name, description, price, categoryId, tag, featured } = req.body;
-    const oldImagePublicId = product.image.publicId;
+    const { name, description, price, categoryId, tag, featured, mainImageIndex = 0 } = req.body;
+    const oldImages = [...(product.images || [])];
+    const oldMainImage = product.image;
 
     // Update fields
     if (name) product.name = name;
@@ -377,22 +462,57 @@ router.put('/:id', authenticateToken, upload.single('image'), [
       product.tag = tag.toLowerCase();
     }
 
-    // Update image if new one is uploaded
-    if (req.file) {
+    // Update images if new ones are uploaded
+    if (req.files && req.files.length > 0) {
+      // Create new images array
+      const newImages = req.files.map((file, index) => ({
+        url: file.path,
+        publicId: file.filename,
+        alt: `${product.name} - Image ${index + 1}`,
+        isMain: index === parseInt(mainImageIndex)
+      }));
+
+      product.images = newImages;
+      
+      // Update legacy image field (use main image)
+      const mainImage = req.files[parseInt(mainImageIndex)] || req.files[0];
       product.image = {
-        url: req.file.path,
-        publicId: req.file.filename
+        url: mainImage.path,
+        publicId: mainImage.filename
       };
     }
 
     await product.save();
 
-    // Delete old image if new image was uploaded
-    if (req.file && oldImagePublicId) {
-      try {
-        await deleteImage(oldImagePublicId);
-      } catch (deleteError) {
-        console.error('Error deleting old image:', deleteError);
+    // Update category product counts if product has categories
+    if (product.categories && product.categories.length > 0) {
+      const Category = require('../models/Category');
+      for (const categoryId of product.categories) {
+        const productCount = await Product.countDocuments({ 
+          categories: categoryId, 
+          isActive: true 
+        });
+        await Category.findByIdAndUpdate(categoryId, { productCount });
+      }
+    }
+
+    // Delete old images if new images were uploaded
+    if (req.files && req.files.length > 0 && oldImages.length > 0) {
+      for (const oldImage of oldImages) {
+        try {
+          await deleteImage(oldImage.publicId);
+        } catch (deleteError) {
+          console.error('Error deleting old image:', deleteError);
+        }
+      }
+      
+      // Also delete the legacy main image if it's different
+      if (oldMainImage && oldMainImage.publicId && !oldImages.find(img => img.publicId === oldMainImage.publicId)) {
+        try {
+          await deleteImage(oldMainImage.publicId);
+        } catch (deleteError) {
+          console.error('Error deleting old main image:', deleteError);
+        }
       }
     }
 
@@ -438,17 +558,47 @@ router.delete('/:id', authenticateToken, async (req, res) => {
       });
     }
 
-    // Delete image from Cloudinary
-    if (product.image.publicId) {
+    // Delete images from Cloudinary
+    if (product.images && product.images.length > 0) {
+      for (const image of product.images) {
+        try {
+          await deleteImage(image.publicId);
+        } catch (deleteError) {
+          console.error('Error deleting image from Cloudinary:', deleteError);
+        }
+      }
+    }
+    
+    // Also delete legacy main image if it exists and is different
+    if (product.image && product.image.publicId && 
+        (!product.images || !product.images.find(img => img.publicId === product.image.publicId))) {
       try {
         await deleteImage(product.image.publicId);
       } catch (deleteError) {
-        console.error('Error deleting image from Cloudinary:', deleteError);
+        console.error('Error deleting legacy image from Cloudinary:', deleteError);
       }
     }
 
-    // Delete product from database
-    await Product.findByIdAndDelete(req.params.id);
+    // Update category product counts before deletion
+    if (product.categories && product.categories.length > 0) {
+      const Category = require('../models/Category');
+      const categoriesToUpdate = [...product.categories];
+      
+      // Delete product from database first
+      await Product.findByIdAndDelete(req.params.id);
+      
+      // Then update category counts
+      for (const categoryId of categoriesToUpdate) {
+        const productCount = await Product.countDocuments({ 
+          categories: categoryId, 
+          isActive: true 
+        });
+        await Category.findByIdAndUpdate(categoryId, { productCount });
+      }
+    } else {
+      // Delete product from database
+      await Product.findByIdAndDelete(req.params.id);
+    }
 
     res.json({
       success: true,
