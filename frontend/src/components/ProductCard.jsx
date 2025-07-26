@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 
 const ProductCard = ({ product }) => {
-  const { _id, name, image, price, tag } = product;
+  const { _id, name, image, tag } = product;
 
   return (
     <Link
@@ -21,11 +21,7 @@ const ProductCard = ({ product }) => {
           {name}
         </h3>
         
-        <div className="mt-2 flex items-center justify-between">
-          <span className="text-xl font-bold text-gray-900">
-            ${price.toFixed(2)}
-          </span>
-          
+        <div className="mt-2">
           <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 capitalize">
             {tag}
           </span>

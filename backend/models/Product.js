@@ -7,26 +7,6 @@ const productSchema = new mongoose.Schema({
     trim: true,
     maxlength: [100, 'Product name cannot exceed 100 characters']
   },
-  description: {
-    type: String,
-    required: [true, 'Product description is required'],
-    trim: true,
-    maxlength: [2000, 'Description cannot exceed 2000 characters']
-  },
-  shortDescription: {
-    type: String,
-    trim: true,
-    maxlength: [200, 'Short description cannot exceed 200 characters']
-  },
-  price: {
-    type: Number,
-    required: [true, 'Product price is required'],
-    min: [0, 'Price cannot be negative']
-  },
-  originalPrice: {
-    type: Number,
-    min: [0, 'Original price cannot be negative']
-  },
   // Multiple categories instead of single tag
   categories: [{
     type: mongoose.Schema.Types.ObjectId,
@@ -163,26 +143,15 @@ productSchema.virtual('mainImage').get(function() {
   return this.image; // Fallback to legacy image field
 });
 
-// Virtual for discounted price
-productSchema.virtual('isOnSale').get(function() {
-  return this.originalPrice && this.originalPrice > this.price;
-});
 
-productSchema.virtual('discountPercentage').get(function() {
-  if (this.originalPrice && this.originalPrice > this.price) {
-    return Math.round(((this.originalPrice - this.price) / this.originalPrice) * 100);
-  }
-  return 0;
-});
 
 // Index for search functionality
-productSchema.index({ name: 'text', description: 'text', shortDescription: 'text' });
+productSchema.index({ name: 'text' });
 productSchema.index({ categories: 1 });
 productSchema.index({ tag: 1 }); // Keep for backward compatibility
 productSchema.index({ createdAt: -1 });
 productSchema.index({ featured: 1 });
 productSchema.index({ trending: 1 });
-productSchema.index({ price: 1 });
 productSchema.index({ isActive: 1 });
 productSchema.index({ slug: 1 });
 

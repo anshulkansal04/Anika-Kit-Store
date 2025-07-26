@@ -25,11 +25,7 @@ const CategoryCard = ({ category }) => {
           {category.name}
         </h3>
         
-        {category.description && (
-          <p className="text-sm text-gray-600 mb-3 line-clamp-2">
-            {category.description}
-          </p>
-        )}
+
         
         <div className="flex items-center justify-between">
           <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800">
@@ -64,15 +60,7 @@ const ProductSearchResult = ({ product }) => {
           {product.name}
         </h3>
         
-        <p className="mt-2 text-sm text-gray-600 line-clamp-2">
-          {product.description}
-        </p>
-        
-        <div className="mt-3 flex items-center justify-between">
-          <span className="text-xl font-bold text-gray-900">
-            ${product.price.toFixed(2)}
-          </span>
-          
+        <div className="mt-3">
           <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 capitalize">
             {product.tag}
           </span>

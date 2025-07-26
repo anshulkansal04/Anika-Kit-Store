@@ -132,7 +132,6 @@ router.get('/:id', async (req, res) => {
 // Create category (admin only)
 router.post('/', authenticateToken, upload.single('image'), [
   body('name').trim().isLength({ min: 1, max: 100 }),
-  body('description').optional().trim().isLength({ max: 500 }),
   body('sortOrder').optional().isInt({ min: 0 })
 ], async (req, res) => {
   try {
@@ -152,11 +151,10 @@ router.post('/', authenticateToken, upload.single('image'), [
       });
     }
 
-    const { name, description, sortOrder = 0 } = req.body;
+    const { name, sortOrder = 0 } = req.body;
 
     const category = new Category({
       name,
-      description,
       sortOrder: parseInt(sortOrder),
       image: {
         url: req.file.path,
@@ -209,7 +207,6 @@ router.post('/', authenticateToken, upload.single('image'), [
 // Update category (admin only)
 router.put('/:id', authenticateToken, upload.single('image'), [
   body('name').optional().trim().isLength({ min: 1, max: 100 }),
-  body('description').optional().trim().isLength({ max: 500 }),
   body('sortOrder').optional().isInt({ min: 0 })
 ], async (req, res) => {
   try {
@@ -230,12 +227,11 @@ router.put('/:id', authenticateToken, upload.single('image'), [
       });
     }
 
-    const { name, description, sortOrder } = req.body;
+    const { name, sortOrder } = req.body;
     const oldImagePublicId = category.image.publicId;
 
     // Update fields
     if (name) category.name = name;
-    if (description !== undefined) category.description = description;
     if (sortOrder !== undefined) category.sortOrder = parseInt(sortOrder);
 
     // Update image if new one is uploaded

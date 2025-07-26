@@ -30,8 +30,6 @@ const AdminDashboard = () => {
   const [editingCategory, setEditingCategory] = useState(null);
   const [formData, setFormData] = useState({
     name: '',
-    description: '',
-    price: '',
     categoryId: '',
     tag: '',
     images: [],
@@ -39,7 +37,6 @@ const AdminDashboard = () => {
   });
   const [categoryFormData, setCategoryFormData] = useState({
     name: '',
-    description: '',
     image: null,
     sortOrder: 0
   });
@@ -116,8 +113,6 @@ const AdminDashboard = () => {
     
     const form = new FormData();
     form.append('name', formData.name);
-    form.append('description', formData.description);
-    form.append('price', formData.price);
     form.append('tag', formData.tag);
     form.append('featured', formData.featured);
     if (formData.categoryId) {
@@ -153,7 +148,6 @@ const AdminDashboard = () => {
     
     const form = new FormData();
     form.append('name', categoryFormData.name);
-    form.append('description', categoryFormData.description);
     form.append('sortOrder', categoryFormData.sortOrder);
     if (categoryFormData.image) {
       form.append('image', categoryFormData.image);
@@ -180,8 +174,6 @@ const AdminDashboard = () => {
     
     const form = new FormData();
     form.append('name', formData.name);
-    form.append('description', formData.description);
-    form.append('price', formData.price);
     form.append('tag', formData.tag);
     form.append('featured', formData.featured);
     if (formData.categoryId) {
@@ -219,7 +211,6 @@ const AdminDashboard = () => {
     
     const form = new FormData();
     form.append('name', categoryFormData.name);
-    form.append('description', categoryFormData.description);
     form.append('sortOrder', categoryFormData.sortOrder);
     if (categoryFormData.image) {
       form.append('image', categoryFormData.image);
@@ -282,8 +273,6 @@ const AdminDashboard = () => {
   const resetForm = () => {
     setFormData({
       name: '',
-      description: '',
-      price: '',
       categoryId: '',
       tag: '',
       images: [],
@@ -294,7 +283,6 @@ const AdminDashboard = () => {
   const resetCategoryForm = () => {
     setCategoryFormData({
       name: '',
-      description: '',
       image: null,
       sortOrder: 0
     });
@@ -311,8 +299,6 @@ const AdminDashboard = () => {
     
     setFormData({
       name: product.name,
-      description: product.description,
-      price: product.price,
       categoryId: matchingCategory ? matchingCategory._id : '',
       tag: product.tag,
       images: [], // Reset images for editing - user will need to upload new ones
@@ -325,7 +311,6 @@ const AdminDashboard = () => {
     setEditingCategory(category);
     setCategoryFormData({
       name: category.name,
-      description: category.description || '',
       image: null,
       sortOrder: category.sortOrder
     });
@@ -539,17 +524,6 @@ const AdminDashboard = () => {
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">Description</label>
-                    <textarea
-                      rows={3}
-                      value={categoryFormData.description}
-                      onChange={(e) => setCategoryFormData({...categoryFormData, description: e.target.value})}
-                      className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                      placeholder="Brief description of the category"
-                    />
-                  </div>
-
-                  <div>
                     <label className="block text-sm font-medium text-gray-700">Category Image *</label>
                     <input
                       type="file"
@@ -604,11 +578,6 @@ const AdminDashboard = () => {
                           <h3 className="text-lg font-semibold text-gray-900 mb-1">
                             {category.name}
                           </h3>
-                          {category.description && (
-                            <p className="text-sm text-gray-600 mb-2 line-clamp-2">
-                              {category.description}
-                            </p>
-                          )}
                           <div className="flex items-center justify-between text-xs text-gray-500">
                             <span>Order: {category.sortOrder}</span>
                             <span>{category.productCount || 0} products</span>
@@ -697,38 +666,13 @@ const AdminDashboard = () => {
                 </h3>
                 
                 <form onSubmit={editingProduct ? handleUpdateProduct : handleAddProduct} className="space-y-4">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700">Name</label>
-                      <input
-                        type="text"
-                        required
-                        value={formData.name}
-                        onChange={(e) => setFormData({...formData, name: e.target.value})}
-                        className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700">Price</label>
-                      <input
-                        type="number"
-                        step="0.01"
-                        required
-                        value={formData.price}
-                        onChange={(e) => setFormData({...formData, price: e.target.value})}
-                        className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                      />
-                    </div>
-                  </div>
-
                   <div>
-                    <label className="block text-sm font-medium text-gray-700">Description</label>
-                    <textarea
+                    <label className="block text-sm font-medium text-gray-700">Name</label>
+                    <input
+                      type="text"
                       required
-                      rows={3}
-                      value={formData.description}
-                      onChange={(e) => setFormData({...formData, description: e.target.value})}
+                      value={formData.name}
+                      onChange={(e) => setFormData({...formData, name: e.target.value})}
                       className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                     />
                   </div>
@@ -864,9 +808,7 @@ const AdminDashboard = () => {
                                 </span>
                               )}
                             </div>
-                            <p className="text-sm text-gray-500">{product.description?.substring(0, 100)}...</p>
                             <div className="mt-1 flex items-center space-x-4">
-                              <span className="text-sm font-medium text-gray-900">${product.price}</span>
                               <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 capitalize">
                                 {product.tag}
                               </span>

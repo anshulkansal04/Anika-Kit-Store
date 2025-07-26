@@ -24,28 +24,7 @@ const ProductCard = ({ product }) => {
           {product.name}
         </h3>
         
-        <p className="mt-2 text-sm text-gray-600 line-clamp-2">
-          {product.description}
-        </p>
-        
-        <div className="mt-3 flex items-center justify-between">
-          <span className="text-xl font-bold text-gray-900">
-            ${product.price.toFixed(2)}
-          </span>
-          
-          {product.originalPrice && product.originalPrice > product.price && (
-            <div className="flex items-center space-x-2">
-              <span className="text-sm text-gray-500 line-through">
-                ${product.originalPrice.toFixed(2)}
-              </span>
-              <span className="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-red-100 text-red-800">
-                {Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)}% OFF
-              </span>
-            </div>
-          )}
-        </div>
-        
-        <div className="mt-2">
+        <div className="mt-3">
           <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 capitalize">
             {product.categories?.[0]?.name || product.tag}
           </span>
@@ -205,11 +184,6 @@ const CategoryProducts = () => {
             <h2 className="text-2xl font-semibold text-gray-900 mb-2">
               {category?.name} Collection
             </h2>
-            {category?.description && (
-              <p className="text-gray-600 mb-3">
-                {category.description}
-              </p>
-            )}
             <div className="flex items-center justify-between">
               <p className="text-sm text-gray-500">
                 {pagination && `Showing ${products.length} of ${pagination.total} products`}

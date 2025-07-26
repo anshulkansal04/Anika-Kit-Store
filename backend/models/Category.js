@@ -8,12 +8,6 @@ const categorySchema = new mongoose.Schema({
     trim: true,
     maxlength: [100, 'Category name cannot exceed 100 characters']
   },
-
-  description: {
-    type: String,
-    trim: true,
-    maxlength: [500, 'Description cannot exceed 500 characters']
-  },
   image: {
     url: {
       type: String,
@@ -43,7 +37,7 @@ const categorySchema = new mongoose.Schema({
 
 
 // Index for search functionality
-categorySchema.index({ name: 'text', description: 'text' });
+categorySchema.index({ name: 'text' });
 categorySchema.index({ isActive: 1 });
 categorySchema.index({ sortOrder: 1 });
 

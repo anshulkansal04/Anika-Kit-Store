@@ -198,35 +198,7 @@ const ProductDetail = () => {
               </div>
             </div>
 
-            {/* Price */}
-            <div className="space-y-2">
-              <div className="flex items-center space-x-4">
-                <span className="text-3xl font-bold text-gray-900">
-                  ${product.price.toFixed(2)}
-                </span>
-                {product.originalPrice && product.originalPrice > product.price && (
-                  <>
-                    <span className="text-xl text-gray-500 line-through">
-                      ${product.originalPrice.toFixed(2)}
-                    </span>
-                    <span className="inline-flex items-center px-2 py-1 rounded text-sm font-medium bg-red-100 text-red-800">
-                      {Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)}% OFF
-                    </span>
-                  </>
-                )}
-              </div>
-              {product.originalPrice && (
-                <p className="text-sm text-green-600">
-                  You save ${(product.originalPrice - product.price).toFixed(2)}
-                </p>
-              )}
-            </div>
 
-            {/* Description */}
-            <div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">Description</h3>
-              <p className="text-gray-600 leading-relaxed">{product.description}</p>
-            </div>
 
             {/* Product Details */}
             {(product.specifications?.length > 0 || product.features?.length > 0) && (
@@ -331,13 +303,7 @@ const ProductDetail = () => {
                     <h3 className="text-lg font-semibold text-gray-900 group-hover:text-blue-600 transition-colors">
                       {relatedProduct.name}
                     </h3>
-                    <p className="mt-2 text-sm text-gray-600 line-clamp-2">
-                      {relatedProduct.description}
-                    </p>
                     <div className="mt-3 flex items-center justify-between">
-                      <span className="text-lg font-bold text-gray-900">
-                        ${relatedProduct.price.toFixed(2)}
-                      </span>
                       <span className="text-blue-600 group-hover:text-blue-800 font-medium text-sm">
                         View →
                       </span>

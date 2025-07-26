@@ -285,8 +285,6 @@ router.get('/:id', async (req, res) => {
 // Create product (admin only)
 router.post('/', authenticateToken, upload.array('images', 5), [
   body('name').trim().isLength({ min: 1, max: 100 }),
-  body('description').trim().isLength({ min: 1, max: 1000 }),
-  body('price').isFloat({ min: 0 }),
   body('categoryId').optional().trim(),
   body('tag').optional().trim().isLength({ min: 1, max: 50 })
 ], async (req, res) => {
@@ -307,13 +305,11 @@ router.post('/', authenticateToken, upload.array('images', 5), [
       });
     }
 
-    const { name, description, price, categoryId, tag, featured = false, mainImageIndex = 0 } = req.body;
+    const { name, categoryId, tag, featured = false, mainImageIndex = 0 } = req.body;
 
     // Build product data
     const productData = {
       name,
-      description,
-      price: parseFloat(price),
       featured: featured === 'true'
     };
 
@@ -411,8 +407,6 @@ router.post('/', authenticateToken, upload.array('images', 5), [
 // Update product (admin only)
 router.put('/:id', authenticateToken, upload.array('images', 5), [
   body('name').optional().trim().isLength({ min: 1, max: 100 }),
-  body('description').optional().trim().isLength({ min: 1, max: 1000 }),
-  body('price').optional().isFloat({ min: 0 }),
   body('categoryId').optional().trim(),
   body('tag').optional().trim().isLength({ min: 1, max: 50 })
 ], async (req, res) => {
@@ -434,14 +428,12 @@ router.put('/:id', authenticateToken, upload.array('images', 5), [
       });
     }
 
-    const { name, description, price, categoryId, tag, featured, mainImageIndex = 0 } = req.body;
+    const { name, categoryId, tag, featured, mainImageIndex = 0 } = req.body;
     const oldImages = [...(product.images || [])];
     const oldMainImage = product.image;
 
     // Update fields
     if (name) product.name = name;
-    if (description) product.description = description;
-    if (price) product.price = parseFloat(price);
     if (featured !== undefined) product.featured = featured === 'true';
 
     // Handle category updates
