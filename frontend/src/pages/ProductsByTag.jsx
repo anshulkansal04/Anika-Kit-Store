@@ -70,12 +70,12 @@ const ProductsByTag = () => {
                 {tagName} Products
               </h1>
             </div>
-            <Link
+            {/* <Link
               to="/admin/login"
               className="bg-gray-900 text-white px-4 py-2 rounded-lg hover:bg-gray-800 transition"
             >
               Admin Login
-            </Link>
+            </Link> */}
           </div>
         </div>
       </header>

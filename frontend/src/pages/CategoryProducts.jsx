@@ -225,13 +225,13 @@ const CategoryProducts = () => {
                 </h1>
               </div>
             </div>
-            <Link
+            {/* <Link
               to="/admin/login"
               className="btn-outline text-xs sm:text-sm px-2 py-1 sm:px-4 sm:py-2 whitespace-nowrap flex-shrink-0"
             >
               <span className="hidden sm:inline">Admin Login</span>
               <span className="sm:hidden">Admin</span>
-            </Link>
+            </Link> */}
           </div>
         </div>
       </header>
