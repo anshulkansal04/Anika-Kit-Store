@@ -8,21 +8,11 @@ import {
   ArrowLeftIcon, 
   SparklesIcon, 
   TagIcon, 
-  GiftIcon,
-  HeartIcon,
-  EyeIcon
+  GiftIcon
 } from '@heroicons/react/24/outline';
-import { HeartIcon as HeartSolidIcon } from '@heroicons/react/24/solid';
 
 const ProductCard = ({ product, index }) => {
-  const [isWishlisted, setIsWishlisted] = useState(false);
   const [imageLoaded, setImageLoaded] = useState(false);
-
-  const handleWishlist = (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setIsWishlisted(!isWishlisted);
-  };
 
   return (
     <div 
@@ -40,34 +30,13 @@ const ProductCard = ({ product, index }) => {
           <img
             src={product.image?.url || product.images?.[0]?.url}
             alt={product.name}
-            className={`h-64 w-full object-cover object-center transition-all duration-500 ${
+            className={`h-64 w-full object-contain object-center transition-all duration-500 ${
               imageLoaded ? 'opacity-100 group-hover:scale-110' : 'opacity-0'
             }`}
             onLoad={() => setImageLoaded(true)}
           />
           
           <div className="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-          
-          <div className="absolute top-3 right-3 flex flex-col space-y-2 opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-x-2 group-hover:translate-x-0">
-            <button
-              onClick={handleWishlist}
-              className={`p-2 rounded-full backdrop-blur-sm transition-all duration-200 transform hover:scale-110 ${
-                isWishlisted 
-                  ? 'bg-red-500 text-white shadow-lg' 
-                  : 'bg-white/90 text-gray-600 hover:bg-white hover:text-red-500'
-              }`}
-            >
-              {isWishlisted ? (
-                <HeartSolidIcon className="h-4 w-4" />
-              ) : (
-                <HeartIcon className="h-4 w-4" />
-              )}
-            </button>
-            
-            <button className="p-2 rounded-full bg-white/90 backdrop-blur-sm text-gray-600 hover:bg-white hover:text-primary-500 transition-all duration-200 transform hover:scale-110">
-              <EyeIcon className="h-4 w-4" />
-            </button>
-          </div>
           
           <div className="absolute top-3 left-3 opacity-0 group-hover:opacity-100 transition-all duration-300 transform -translate-x-2 group-hover:translate-x-0">
             <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-white/90 backdrop-blur-sm text-gray-700 border border-white/50">

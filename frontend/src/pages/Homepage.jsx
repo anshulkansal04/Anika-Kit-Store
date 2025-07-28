@@ -23,7 +23,7 @@ const CategoryCard = ({ category }) => {
         <img
           src={category.image.url}
           alt={category.name}
-          className="h-56 w-full object-cover object-center group-hover:scale-110 transition-transform duration-500"
+          className="h-56 w-full object-contain object-center group-hover:scale-110 transition-transform duration-500"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
       </div>
@@ -61,7 +61,7 @@ const ProductSearchResult = ({ product }) => {
         <img
           src={product.image?.url || product.images?.[0]?.url}
           alt={product.name}
-          className="h-48 w-full object-cover object-center group-hover:scale-110 transition-transform duration-500"
+          className="h-48 w-full object-contain object-center group-hover:scale-110 transition-transform duration-500"
         />
         <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
           <div className="bg-white/90 backdrop-blur-sm rounded-full p-2">
@@ -162,13 +162,13 @@ const Homepage = () => {
                 </p>
               </div>
             </div>
-            <Link
+            {/* <Link
               to="/admin/login"
               className="btn-outline text-xs sm:text-sm px-3 py-1.5 sm:px-4 sm:py-2 whitespace-nowrap"
             >
               <span className="hidden sm:inline">Admin Login</span>
               <span className="sm:hidden">Admin</span>
-            </Link>
+            </Link> */}
           </div>
         </div>
       </header>

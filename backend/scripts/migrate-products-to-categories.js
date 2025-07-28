@@ -11,7 +11,7 @@ mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/ecatalogu
 
 async function migrateProductsToCategories() {
   try {
-    console.log('Starting migration: Associating products with categories...');
+    // console.log('Starting migration: Associating products with categories...');
     
     // Get all products that have tags but empty categories
     const products = await Product.find({
@@ -19,11 +19,11 @@ async function migrateProductsToCategories() {
       tag: { $exists: true, $ne: '' }
     });
     
-    console.log(`Found ${products.length} products to migrate`);
+    // console.log(`Found ${products.length} products to migrate`);
     
     // Get all categories
     const categories = await Category.find({});
-    console.log(`Found ${categories.length} categories`);
+    // console.log(`Found ${categories.length} categories`);
     
     let migratedCount = 0;
     
@@ -47,10 +47,10 @@ async function migrateProductsToCategories() {
       }
     }
     
-    console.log(`\n🎉 Migration completed! ${migratedCount} products migrated.`);
+    // console.log(`\n🎉 Migration completed! ${migratedCount} products migrated.`);
     
     // Update category product counts
-    console.log('\nUpdating category product counts...');
+    // console.log('\nUpdating category product counts...');
     for (const category of categories) {
       const productCount = await Product.countDocuments({ 
         categories: category._id, 
@@ -58,10 +58,10 @@ async function migrateProductsToCategories() {
       });
       
       await Category.findByIdAndUpdate(category._id, { productCount });
-      console.log(`Updated category "${category.name}" product count to ${productCount}`);
+      // console.log(`Updated category "${category.name}" product count to ${productCount}`);
     }
     
-    console.log('\n✅ Category product counts updated!');
+    // console.log('\n✅ Category product counts updated!');
     
   } catch (error) {
     console.error('Migration failed:', error);

@@ -5,7 +5,6 @@ import { categoryService } from '../services/categoryService';
 import Loading from '../components/Loading';
 import Footer from '../components/Footer';
 import { 
-  HeartIcon,
   ShareIcon,
   TagIcon,
   InformationCircleIcon,
@@ -13,7 +12,6 @@ import {
   SparklesIcon,
   GiftIcon
 } from '@heroicons/react/24/outline';
-import { HeartIcon as HeartSolidIcon } from '@heroicons/react/24/solid';
 
 const ProductDetail = () => {
   const { productSlug } = useParams();
@@ -23,7 +21,6 @@ const ProductDetail = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
-  const [isWishlisted, setIsWishlisted] = useState(false);
 
   useEffect(() => {
     fetchProductDetail();
@@ -84,11 +81,6 @@ const ProductDetail = () => {
       navigator.clipboard.writeText(window.location.href);
       alert('Product link copied to clipboard!');
     }
-  };
-
-  const toggleWishlist = () => {
-    setIsWishlisted(!isWishlisted);
-    // In a real app, this would save to user's wishlist
   };
 
   if (loading) return <Loading text="Loading product details..." />;
@@ -171,7 +163,7 @@ const ProductDetail = () => {
                 <img
                   src={mainImage?.url || product.image?.url}
                   alt={product.name}
-                  className="w-full h-96 object-cover object-center hover:scale-105 transition-transform duration-500"
+                  className="w-full h-96 object-contain object-center hover:scale-105 transition-transform duration-500"
                 />
               </div>
             </div>
@@ -192,7 +184,7 @@ const ProductDetail = () => {
                     <img
                       src={image.url}
                       alt={`${product.name} ${index + 1}`}
-                      className="w-full h-full object-cover"
+                      className="w-full h-full object-contain"
                     />
                   </button>
                 ))}
@@ -265,24 +257,6 @@ const ProductDetail = () => {
             {/* Actions */}
             <div className="flex space-x-4 pt-6 border-t border-gray-200">
               <button
-                onClick={toggleWishlist}
-                className={`flex items-center space-x-2 px-6 py-3 rounded-xl font-medium transition-all duration-300 transform hover:-translate-y-0.5 ${
-                  isWishlisted 
-                    ? 'bg-red-500 text-white shadow-medium' 
-                    : 'bg-white border-2 border-gray-200 text-gray-600 hover:border-red-300 hover:text-red-500 shadow-soft hover:shadow-medium'
-                }`}
-              >
-                {isWishlisted ? (
-                  <HeartSolidIcon className="h-5 w-5" />
-                ) : (
-                  <HeartIcon className="h-5 w-5" />
-                )}
-                <span>
-                  {isWishlisted ? 'Wishlisted' : 'Add to Wishlist'}
-                </span>
-              </button>
-
-              <button
                 onClick={handleShare}
                 className="flex items-center space-x-2 px-6 py-3 rounded-xl bg-white border-2 border-gray-200 text-gray-600 font-medium hover:border-primary-300 hover:text-primary-600 transition-all duration-300 shadow-soft hover:shadow-medium transform hover:-translate-y-0.5"
               >
@@ -300,14 +274,6 @@ const ProductDetail = () => {
                   <ul className="space-y-1 text-primary-700">
                     {product.sku && <li><span className="font-medium">SKU:</span> {product.sku}</li>}
                     {product.weight && <li><span className="font-medium">Weight:</span> {product.weight}g</li>}
-                    {product.stock !== undefined && (
-                      <li>
-                        <span className="font-medium">Stock:</span> 
-                        <span className={product.stock > 0 ? 'text-success-600' : 'text-red-600'}>
-                          {product.stock > 0 ? ` ${product.stock} available` : ' Out of stock'}
-                        </span>
-                      </li>
-                    )}
                   </ul>
                 </div>
               </div>
@@ -336,7 +302,7 @@ const ProductDetail = () => {
                       <img
                         src={relatedProduct.image?.url || relatedProduct.images?.[0]?.url}
                         alt={relatedProduct.name}
-                        className="h-48 w-full object-cover object-center group-hover:scale-110 transition-transform duration-500"
+                        className="h-48 w-full object-contain object-center group-hover:scale-110 transition-transform duration-500"
                       />
                     </div>
                     <div className="p-6">

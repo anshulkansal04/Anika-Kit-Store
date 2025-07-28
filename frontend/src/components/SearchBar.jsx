@@ -71,15 +71,11 @@ const SearchBar = ({ onSearch, isLoading }) => {
       <div className="mt-3 sm:mt-4 flex flex-col sm:flex-row items-center justify-center space-y-2 sm:space-y-0 sm:space-x-6 text-xs sm:text-sm text-gray-500">
         <div className="flex items-center space-x-2">
           <SparklesIcon className="h-3 w-3 sm:h-4 sm:w-4 text-primary-400" />
-          <span>Popular: <span className="text-primary-600 font-medium">Kids Gifts</span></span>
+          <span>Popular: <span className="text-primary-600 font-medium">Storage Boxes</span></span>
         </div>
         <div className="flex items-center space-x-2">
           <SparklesIcon className="h-3 w-3 sm:h-4 sm:w-4 text-secondary-400" />
-          <span>Trending: <span className="text-secondary-600 font-medium">Storage Boxes</span></span>
-        </div>
-        <div className="hidden sm:flex items-center space-x-2">
-          <SparklesIcon className="h-4 w-4 text-accent-400" />
-          <span>Featured: <span className="text-accent-600 font-medium">Hair Accessories</span></span>
+          <span>Trending: <span className="text-secondary-600 font-medium">Labubu Toys</span></span>
         </div>
       </div>
       
