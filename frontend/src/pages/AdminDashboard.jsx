@@ -30,9 +30,9 @@ const AdminDashboard = () => {
   const [editingCategory, setEditingCategory] = useState(null);
   const [formData, setFormData] = useState({
     name: '',
-    categoryId: '',
     tag: '',
     images: [],
+    categoryIds: [], // Changed from categoryId to categoryIds for multiple selection
     featured: false
   });
   const [categoryFormData, setCategoryFormData] = useState({
@@ -105,18 +105,26 @@ const AdminDashboard = () => {
   const handleAddProduct = async (e) => {
     e.preventDefault();
     
-    // Validate that at least one image is selected
-    if (!formData.images || formData.images.length === 0) {
+    if (formData.images.length === 0) {
       setError('Please select at least one product image');
+      return;
+    }
+    
+    if (formData.categoryIds.length === 0) {
+      setError('Please select at least one category');
       return;
     }
     
     const form = new FormData();
     form.append('name', formData.name);
-    form.append('tag', formData.tag);
+    form.append('tag', formData.tag || '');
     form.append('featured', formData.featured);
-    if (formData.categoryId) {
-      form.append('categoryId', formData.categoryId);
+    
+    // Handle multiple categories
+    if (formData.categoryIds && formData.categoryIds.length > 0) {
+      formData.categoryIds.forEach(categoryId => {
+        form.append('categoryIds[]', categoryId);
+      });
     }
     
     // Append multiple images
@@ -139,7 +147,20 @@ const AdminDashboard = () => {
       }
     } catch (err) {
       console.error('Error creating product:', err);
-      setError(err.response?.data?.message || 'Failed to create product');
+      console.error('Error details:', {
+        status: err.response?.status,
+        data: err.response?.data,
+        message: err.message
+      });
+      
+      let errorMessage = 'Failed to create product';
+      if (err.response?.data?.message) {
+        errorMessage = err.response.data.message;
+      } else if (err.message) {
+        errorMessage = err.message;
+      }
+      
+      setError(errorMessage);
     }
   };
 
@@ -174,10 +195,13 @@ const AdminDashboard = () => {
     
     const form = new FormData();
     form.append('name', formData.name);
-    form.append('tag', formData.tag);
+    form.append('tag', formData.tag || '');
     form.append('featured', formData.featured);
-    if (formData.categoryId) {
-      form.append('categoryId', formData.categoryId);
+    // Handle multiple categories
+    if (formData.categoryIds && formData.categoryIds.length > 0) {
+      formData.categoryIds.forEach(categoryId => {
+        form.append('categoryIds[]', categoryId);
+      });
     }
     
     // Append multiple images if provided
@@ -273,9 +297,9 @@ const AdminDashboard = () => {
   const resetForm = () => {
     setFormData({
       name: '',
-      categoryId: '',
       tag: '',
       images: [],
+      categoryIds: [], // Changed from categoryId to categoryIds
       featured: false
     });
   };
@@ -291,15 +315,12 @@ const AdminDashboard = () => {
   const startEdit = (product) => {
     setEditingProduct(product);
     
-    // Find the category that matches the product's category or tag
-    const matchingCategory = categories.find(cat => 
-      (product.categories && product.categories.length > 0 && cat._id === product.categories[0]._id) ||
-      cat.name.toLowerCase().replace(/\s+/g, '-') === product.tag
-    );
+    // Get all matching category IDs
+    const matchingCategoryIds = product.categories ? product.categories.map(cat => cat._id) : [];
     
     setFormData({
       name: product.name,
-      categoryId: matchingCategory ? matchingCategory._id : '',
+      categoryIds: matchingCategoryIds,
       tag: product.tag,
       images: [], // Reset images for editing - user will need to upload new ones
       featured: product.featured
@@ -679,30 +700,40 @@ const AdminDashboard = () => {
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700">Category *</label>
-                      <select
-                        required
-                        value={formData.categoryId}
-                        onChange={(e) => {
-                          const selectedCategory = categories.find(cat => cat._id === e.target.value);
-                          setFormData({
-                            ...formData, 
-                            categoryId: e.target.value,
-                            tag: selectedCategory ? selectedCategory.name.toLowerCase().replace(/\s+/g, '-') : ''
-                          });
-                        }}
-                        className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                      >
-                        <option value="">Select a category...</option>
+                      <label className="block text-sm font-medium text-gray-700">Categories *</label>
+                      <div className="mt-1 space-y-2 max-h-32 overflow-y-auto border border-gray-300 rounded-md p-2">
                         {categories.map((category) => (
-                          <option key={category._id} value={category._id}>
-                            {category.name}
-                          </option>
+                          <label key={category._id} className="flex items-center space-x-2">
+                            <input
+                              type="checkbox"
+                              checked={formData.categoryIds.includes(category._id)}
+                              onChange={(e) => {
+                                if (e.target.checked) {
+                                  setFormData({
+                                    ...formData,
+                                    categoryIds: [...formData.categoryIds, category._id]
+                                  });
+                                } else {
+                                  setFormData({
+                                    ...formData,
+                                    categoryIds: formData.categoryIds.filter(id => id !== category._id)
+                                  });
+                                }
+                              }}
+                              className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                            />
+                            <span className="text-sm text-gray-700">{category.name}</span>
+                          </label>
                         ))}
-                      </select>
+                      </div>
                       {categories.length === 0 && (
                         <p className="mt-1 text-sm text-gray-500">
                           No categories available. Please create a category first.
+                        </p>
+                      )}
+                      {formData.categoryIds.length === 0 && (
+                        <p className="mt-1 text-sm text-red-500">
+                          Please select at least one category.
                         </p>
                       )}
                     </div>

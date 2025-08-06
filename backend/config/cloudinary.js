@@ -16,8 +16,9 @@ const storage = new CloudinaryStorage({
     folder: 'ecatalogue-products',
     allowed_formats: ['jpg', 'jpeg', 'png', 'webp'],
     transformation: [
-      { width: 800, height: 800, crop: 'limit' },
-      { quality: 'auto' }
+      { width: 800, height: 800, crop: 'scale' },
+      {quality: "auto"},
+      {fetch_format: "auto"}
     ]
   }
 });
@@ -55,8 +56,9 @@ const uploadImage = async (file) => {
     const result = await cloudinary.uploader.upload(file, {
       folder: 'ecatalogue-products',
       transformation: [
-        { width: 800, height: 800, crop: 'limit' },
-        { quality: 'auto' }
+        { width: 800, height: 800, crop: 'scale' },
+        { quality: "auto" },
+        { fetch_format: "auto" }
       ]
     });
     

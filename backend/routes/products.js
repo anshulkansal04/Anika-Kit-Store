@@ -282,11 +282,45 @@ router.get('/:id', async (req, res) => {
   }
 });
 
+// Multer error handling middleware
+const handleMulterErrors = (err, req, res, next) => {
+  if (err) {
+    console.error('Multer error:', err);
+    
+    if (err.code === 'LIMIT_FILE_SIZE') {
+      return res.status(400).json({
+        success: false,
+        message: 'File size too large. Maximum size is 5MB per image.'
+      });
+    }
+    
+    if (err.code === 'LIMIT_FILE_COUNT') {
+      return res.status(400).json({
+        success: false,
+        message: 'Too many files. Maximum 5 images allowed.'
+      });
+    }
+    
+    if (err.code === 'LIMIT_UNEXPECTED_FILE') {
+      return res.status(400).json({
+        success: false,
+        message: 'Unexpected file field. Please use "images" field for file uploads.'
+      });
+    }
+    
+    return res.status(400).json({
+      success: false,
+      message: err.message || 'File upload error'
+    });
+  }
+  next();
+};
+
 // Create product (admin only)
-router.post('/', authenticateToken, upload.array('images', 5), [
+router.post('/', authenticateToken, upload.array('images', 5), handleMulterErrors, [
   body('name').trim().isLength({ min: 1, max: 100 }),
-  body('categoryId').optional().trim(),
-  body('tag').optional().trim().isLength({ min: 1, max: 50 })
+  body('categoryIds').optional(),
+  body('tag').optional().trim().isLength({ min: 0, max: 50 })
 ], async (req, res) => {
   try {
     const errors = validationResult(req);
@@ -305,7 +339,13 @@ router.post('/', authenticateToken, upload.array('images', 5), [
       });
     }
 
-    const { name, categoryId, tag, featured = false, mainImageIndex = 0 } = req.body;
+    const { name, tag, featured = false, mainImageIndex = 0 } = req.body;
+    
+    // Handle categoryIds - could be array or single value
+    let categoryIds = req.body.categoryIds;
+    if (categoryIds && !Array.isArray(categoryIds)) {
+      categoryIds = [categoryIds];
+    }
 
     // Build product data
     const productData = {
@@ -330,26 +370,26 @@ router.post('/', authenticateToken, upload.array('images', 5), [
       publicId: mainImage.filename
     };
 
-    // Handle categories - prefer categoryId over tag
-    if (categoryId) {
-      // Verify the category exists
+    // Handle categories - prefer categoryIds over tag
+    if (categoryIds && categoryIds.length > 0) {
+      // Verify all categories exist
       const Category = require('../models/Category');
-      const category = await Category.findById(categoryId);
-      if (!category) {
+      const categories = await Category.find({ _id: { $in: categoryIds } });
+      if (categories.length !== categoryIds.length) {
         return res.status(400).json({
           success: false,
-          message: 'Selected category does not exist'
+          message: 'One or more selected categories do not exist'
         });
       }
-      productData.categories = [categoryId];
-      productData.tag = tag || category.name.toLowerCase().replace(/\s+/g, '-');
+      productData.categories = categoryIds;
+      productData.tag = tag || categories[0].name.toLowerCase().replace(/\s+/g, '-');
     } else if (tag) {
       // Legacy support: use tag only
       productData.tag = tag.toLowerCase();
     } else {
       return res.status(400).json({
         success: false,
-        message: 'Either categoryId or tag is required'
+        message: 'Either categoryIds or tag is required'
       });
     }
 
@@ -397,6 +437,28 @@ router.post('/', authenticateToken, upload.array('images', 5), [
       });
     }
 
+    // Handle multer file upload errors
+    if (error.code === 'LIMIT_FILE_SIZE') {
+      return res.status(400).json({
+        success: false,
+        message: 'File size too large. Maximum size is 5MB per image.'
+      });
+    }
+
+    if (error.code === 'LIMIT_FILE_COUNT') {
+      return res.status(400).json({
+        success: false,
+        message: 'Too many files. Maximum 5 images allowed.'
+      });
+    }
+
+    if (error.code === 'LIMIT_UNEXPECTED_FILE') {
+      return res.status(400).json({
+        success: false,
+        message: 'Unexpected file field. Please use "images" field for file uploads.'
+      });
+    }
+
     res.status(500).json({
       success: false,
       message: 'Internal server error'
@@ -405,10 +467,10 @@ router.post('/', authenticateToken, upload.array('images', 5), [
 });
 
 // Update product (admin only)
-router.put('/:id', authenticateToken, upload.array('images', 5), [
+router.put('/:id', authenticateToken, upload.array('images', 5), handleMulterErrors, [
   body('name').optional().trim().isLength({ min: 1, max: 100 }),
-  body('categoryId').optional().trim(),
-  body('tag').optional().trim().isLength({ min: 1, max: 50 })
+  body('categoryIds').optional(),
+  body('tag').optional().trim().isLength({ min: 0, max: 50 })
 ], async (req, res) => {
   try {
     const errors = validationResult(req);
@@ -428,7 +490,14 @@ router.put('/:id', authenticateToken, upload.array('images', 5), [
       });
     }
 
-    const { name, categoryId, tag, featured, mainImageIndex = 0 } = req.body;
+    const { name, tag, featured, mainImageIndex = 0 } = req.body;
+    
+    // Handle categoryIds - could be array or single value
+    let categoryIds = req.body.categoryIds;
+    if (categoryIds && !Array.isArray(categoryIds)) {
+      categoryIds = [categoryIds];
+    }
+    
     const oldImages = [...(product.images || [])];
     const oldMainImage = product.image;
 
@@ -437,18 +506,18 @@ router.put('/:id', authenticateToken, upload.array('images', 5), [
     if (featured !== undefined) product.featured = featured === 'true';
 
     // Handle category updates
-    if (categoryId) {
-      // Verify the category exists
+    if (categoryIds && categoryIds.length > 0) {
+      // Verify all categories exist
       const Category = require('../models/Category');
-      const category = await Category.findById(categoryId);
-      if (!category) {
+      const categories = await Category.find({ _id: { $in: categoryIds } });
+      if (categories.length !== categoryIds.length) {
         return res.status(400).json({
           success: false,
-          message: 'Selected category does not exist'
+          message: 'One or more selected categories do not exist'
         });
       }
-      product.categories = [categoryId];
-      product.tag = tag || category.name.toLowerCase().replace(/\s+/g, '-');
+      product.categories = categoryIds;
+      product.tag = tag || categories[0].name.toLowerCase().replace(/\s+/g, '-');
     } else if (tag) {
       // Legacy support: update tag only
       product.tag = tag.toLowerCase();
