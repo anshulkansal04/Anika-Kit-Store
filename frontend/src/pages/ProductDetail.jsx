@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { productService } from '../services/productService';
 import { categoryService } from '../services/categoryService';
@@ -21,6 +21,7 @@ const ProductDetail = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
+  const imageContainerRef = useRef(null);
 
   useEffect(() => {
     fetchProductDetail();
@@ -81,6 +82,48 @@ const ProductDetail = () => {
       navigator.clipboard.writeText(window.location.href);
       alert('Product link copied to clipboard!');
     }
+  };
+
+  // Touch/swipe handlers for mobile
+  const handleTouchStart = (e) => {
+    const touch = e.touches[0];
+    imageContainerRef.current.touchStartX = touch.clientX;
+  };
+
+  const handleTouchMove = (e) => {
+    if (!imageContainerRef.current.touchStartX) return;
+    
+    const touch = e.touches[0];
+    const diff = imageContainerRef.current.touchStartX - touch.clientX;
+    
+    // Prevent default scrolling behavior during horizontal swipe
+    if (Math.abs(diff) > 10) {
+      e.preventDefault();
+    }
+  };
+
+  const handleTouchEnd = (e) => {
+    if (!imageContainerRef.current.touchStartX) return;
+    
+    const touch = e.changedTouches[0];
+    const diff = imageContainerRef.current.touchStartX - touch.clientX;
+    const threshold = 50; // Minimum swipe distance
+    
+    if (Math.abs(diff) > threshold && productImages.length > 1) {
+      if (diff > 0) {
+        // Swipe left - next image
+        setSelectedImageIndex(prev => 
+          prev === productImages.length - 1 ? 0 : prev + 1
+        );
+      } else {
+        // Swipe right - previous image
+        setSelectedImageIndex(prev => 
+          prev === 0 ? productImages.length - 1 : prev - 1
+        );
+      }
+    }
+    
+    imageContainerRef.current.touchStartX = null;
   };
 
   if (loading) return <Loading text="Loading product details..." />;
@@ -159,18 +202,67 @@ const ProductDetail = () => {
           <div className="space-y-6">
             {/* Main Image */}
             <div className="card overflow-hidden">
-              <div className="aspect-w-1 aspect-h-1 w-full overflow-hidden bg-gradient-to-br from-warm-100 to-primary-100">
+              <div 
+                ref={imageContainerRef}
+                className="aspect-w-1 aspect-h-1 w-full overflow-hidden bg-gradient-to-br from-warm-100 to-primary-100 relative touch-pan-x"
+                onTouchStart={handleTouchStart}
+                onTouchMove={handleTouchMove}
+                onTouchEnd={handleTouchEnd}
+              >
                 <img
                   src={mainImage?.url || product.image?.url}
                   alt={product.name}
                   className="w-full h-96 object-contain object-center hover:scale-105 transition-transform duration-500"
                 />
+                
+                {/* Mobile swipe indicators */}
+                {/* {productImages.length > 1 && (
+                  <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2 md:hidden">
+                    {productImages.map((_, index) => (
+                      <button
+                        key={index}
+                        onClick={() => setSelectedImageIndex(index)}
+                        className={`w-2 h-2 rounded-full transition-all duration-300 ${
+                          selectedImageIndex === index 
+                            ? 'bg-primary-600 w-6' 
+                            : 'bg-white/60 hover:bg-white/80'
+                        }`}
+                      />
+                    ))}
+                  </div>
+                )} */}
+                
+                {/* Mobile navigation arrows */}
+                {/* {productImages.length > 1 && (
+                  <>
+                    <button
+                      onClick={() => setSelectedImageIndex(prev => 
+                        prev === 0 ? productImages.length - 1 : prev - 1
+                      )}
+                      className="absolute left-2 top-1/2 transform -translate-y-1/2 bg-white/80 hover:bg-white rounded-full p-2 shadow-lg transition-all duration-300 md:hidden"
+                    >
+                      <svg className="w-4 h-4 text-gray-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                      </svg>
+                    </button>
+                    <button
+                      onClick={() => setSelectedImageIndex(prev => 
+                        prev === productImages.length - 1 ? 0 : prev + 1
+                      )}
+                      className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-white/80 hover:bg-white rounded-full p-2 shadow-lg transition-all duration-300 md:hidden"
+                    >
+                      <svg className="w-4 h-4 text-gray-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                      </svg>
+                    </button>
+                  </>
+                )} */}
               </div>
             </div>
             
-            {/* Thumbnail Images */}
+            {/* Thumbnail Images - Hidden on mobile, shown on desktop */}
             {productImages.length > 1 && (
-              <div className="flex space-x-3 overflow-x-auto pb-2">
+              <div className="hidden md:flex space-x-3 overflow-x-auto pb-2">
                 {productImages.map((image, index) => (
                   <button
                     key={index}
@@ -188,6 +280,31 @@ const ProductDetail = () => {
                     />
                   </button>
                 ))}
+              </div>
+            )}
+            
+            {/* Mobile horizontal scroll thumbnails */}
+            {productImages.length > 1 && (
+              <div className="md:hidden">
+                <div className="flex space-x-3 overflow-x-auto pb-2 scrollbar-hide snap-x snap-mandatory">
+                  {productImages.map((image, index) => (
+                    <button
+                      key={index}
+                      onClick={() => setSelectedImageIndex(index)}
+                      className={`flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden border-2 transition-all duration-300 snap-start ${
+                        selectedImageIndex === index 
+                          ? 'border-primary-500 shadow-medium transform scale-105' 
+                          : 'border-gray-200 hover:border-gray-300'
+                      }`}
+                    >
+                      <img
+                        src={image.url}
+                        alt={`${product.name} ${index + 1}`}
+                        className="w-full h-full object-contain"
+                      />
+                    </button>
+                  ))}
+                </div>
               </div>
             )}
           </div>
