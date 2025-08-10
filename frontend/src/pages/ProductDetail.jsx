@@ -40,8 +40,18 @@ const ProductDetail = () => {
           p.slug === productSlug || 
           p.name.toLowerCase().replace(/[^a-z0-9]/g, '-').includes(productSlug.split('-')[0])
         ) || searchResponse.data.products[0];
-        
-        setProduct(foundProduct);
+
+        // Fetch full product details by ID to include fields like SKU/specs
+        try {
+          const detailResponse = await productService.getProductById(foundProduct._id);
+          if (detailResponse.success) {
+            setProduct(detailResponse.data.product);
+          } else {
+            setProduct(foundProduct);
+          }
+        } catch (e) {
+          setProduct(foundProduct);
+        }
         
         // Fetch related products from the same category
         if (foundProduct.tag) {
@@ -139,7 +149,6 @@ const ProductDetail = () => {
             to="/"
             className="btn-primary"
           >
-            <ArrowLeftIcon className="h-4 w-4 mr-2" />
             Back to Homepage
           </Link>
         </div>

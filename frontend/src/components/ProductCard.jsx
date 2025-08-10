@@ -29,6 +29,7 @@ const ProductCard = ({ product }) => {
           <img
             src={image.url}
             alt={name}
+            loading="lazy"
             className={`h-64 w-full object-contain object-center transition-all duration-500 ${
               imageLoaded ? 'opacity-100 group-hover:scale-110' : 'opacity-0'
             }`}

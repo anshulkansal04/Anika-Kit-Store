@@ -75,10 +75,12 @@ router.get('/', [
       .sort(sortOptions)
       .skip(skip)
       .limit(parseInt(limit))
-      .select('-__v');
+      .select('name slug images image featured categories createdAt tag')
+      .lean();
 
     // Get total count for pagination
     const total = await Product.countDocuments(query);
+    res.set('Cache-Control', 'public, max-age=30, s-maxage=300, stale-while-revalidate=86400');
 
     res.json({
       success: true,
@@ -129,13 +131,14 @@ router.get('/category/:categoryId', [
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(parseInt(limit))
-      .select('-__v');
+      .select('name slug images image featured categories createdAt tag')
+      .lean();
 
     const total = await Product.countDocuments({
       categories: categoryId,
       isActive: true
     });
-
+    res.set('Cache-Control', 'public, max-age=30, s-maxage=300, stale-while-revalidate=86400');
     res.json({
       success: true,
       data: {
@@ -186,13 +189,14 @@ router.get('/tag/:tagName', [
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(parseInt(limit))
-      .select('-__v');
+      .select('name slug images image featured categories createdAt tag')
+      .lean();
 
     const total = await Product.countDocuments({
       tag: tagName.toLowerCase(),
       isActive: true
     });
-
+    res.set('Cache-Control', 'public, max-age=30, s-maxage=300, stale-while-revalidate=86400');
     res.json({
       success: true,
       data: {

@@ -38,40 +38,24 @@ router.get('/', [
     // Calculate skip
     const skip = (parseInt(page) - 1) * parseInt(limit);
 
-    // Get categories with pagination
+    // Get categories with pagination (lean for performance)
     const categories = await Category.find(query)
       .sort({ sortOrder: 1, name: 1 })
       .skip(skip)
       .limit(parseInt(limit))
-      .select('-__v');
-
-    // Update product count for each category
-    const categoriesWithCount = await Promise.all(
-      categories.map(async (category) => {
-        const productCount = await Product.countDocuments({ 
-          categories: category._id, 
-          isActive: true 
-        });
-        
-        // Update product count in database if different
-        if (category.productCount !== productCount) {
-          await Category.findByIdAndUpdate(category._id, { productCount });
-        }
-        
-        return {
-          ...category.toObject(),
-          productCount
-        };
-      })
-    );
+      .select('-__v')
+      .lean();
 
     // Get total count for pagination
     const total = await Category.countDocuments(query);
 
+    // Cache headers for client/CDN
+    res.set('Cache-Control', 'public, max-age=60, s-maxage=600, stale-while-revalidate=86400');
+
     res.json({
       success: true,
       data: {
-        categories: categoriesWithCount,
+        categories,
         pagination: {
           current: parseInt(page),
           pages: Math.ceil(total / parseInt(limit)),

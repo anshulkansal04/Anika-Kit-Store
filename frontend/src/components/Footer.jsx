@@ -225,14 +225,18 @@ const Footer = () => {
             <div className="flex items-center justify-center md:justify-start space-x-3">
               <span className="text-white font-medium text-xs lg:text-sm">Follow:</span>
               <a
-                href="#"
+                href="https://www.facebook.com/anikakitstore23/"
+                target="_blank"
+                rel="noopener noreferrer"
                 className="w-7 h-7 lg:w-8 lg:h-8 bg-blue-600 rounded-full flex items-center justify-center hover:scale-110 transition-transform"
                 aria-label="Facebook"
               >
                 <FaFacebookF className="text-white text-xs" />
               </a>
               <a
-                href="#"
+                href="https://www.instagram.com/anikakitstore14/"
+                target="_blank"
+                rel="noopener noreferrer"
                 className="w-7 h-7 lg:w-8 lg:h-8 bg-pink-600 rounded-full flex items-center justify-center hover:scale-110 transition-transform"
                 aria-label="Instagram"
               >

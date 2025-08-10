@@ -30,6 +30,7 @@ const ProductCard = ({ product, index }) => {
           <img
             src={product.image?.url || product.images?.[0]?.url}
             alt={product.name}
+            loading="lazy"
             className={`h-64 w-full object-contain object-center transition-all duration-500 ${
               imageLoaded ? 'opacity-100 group-hover:scale-110' : 'opacity-0'
             }`}
@@ -187,7 +188,7 @@ const CategoryProducts = () => {
             to="/"
             className="btn-primary"
           >
-            <ArrowLeftIcon className="h-4 w-4 mr-2" />
+            {/* <ArrowLeftIcon className="h-4 w-4 mr-2" /> */}
             Back to Homepage
           </Link>
         </div>
@@ -316,7 +317,6 @@ const CategoryProducts = () => {
               to="/" 
               className="btn-secondary"
             >
-              <ArrowLeftIcon className="h-4 w-4 mr-2" />
               Browse All Categories
             </Link>
           </div>
