@@ -56,5 +56,10 @@ export const categoryService = {
   deleteCategory: async (id) => {
     const response = await categoryAPI.delete(`/${id}`);
     return response.data;
+  },
+
+  updateCategoriesOrder: async (orderUpdates) => {
+    const response = await categoryAPI.put('/admin/reorder', { orderUpdates });
+    return response.data;
   }
 }; 

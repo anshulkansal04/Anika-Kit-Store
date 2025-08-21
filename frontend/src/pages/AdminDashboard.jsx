@@ -13,6 +13,101 @@ import {
   ArrowRightOnRectangleIcon,
   TagIcon
 } from '@heroicons/react/24/outline';
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragOverlay,
+} from '@dnd-kit/core';
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+  rectSortingStrategy,
+} from '@dnd-kit/sortable';
+import {
+  useSortable,
+} from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
+
+// Sortable Category Card Component
+const SortableCategoryCard = ({ category, onEdit, onDelete }) => {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: category._id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+  };
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      className={`bg-white rounded-lg shadow-md overflow-hidden ${
+        isDragging ? 'shadow-lg ring-2 ring-blue-500 ring-opacity-50' : ''
+      }`}
+    >
+      {/* Drag handle */}
+      <div
+        {...attributes}
+        {...listeners}
+        className="cursor-grab active:cursor-grabbing p-2 bg-gray-50 border-b flex items-center justify-center text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors"
+      >
+        <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+          <path d="M7 2a2 2 0 1 0 .001 4.001A2 2 0 0 0 7 2zM7 8a2 2 0 1 0 .001 4.001A2 2 0 0 0 7 8zM7 14a2 2 0 1 0 .001 4.001A2 2 0 0 0 7 14zM13 2a2 2 0 1 0 .001 4.001A2 2 0 0 0 13 2zM13 8a2 2 0 1 0 .001 4.001A2 2 0 0 0 13 8zM13 14a2 2 0 1 0 .001 4.001A2 2 0 0 0 13 14z" />
+        </svg>
+      </div>
+      
+      {/* Category content */}
+      <div className="aspect-w-16 aspect-h-9">
+        <img
+          src={category.image.url}
+          alt={category.name}
+          className="w-full h-48 object-cover"
+        />
+      </div>
+      <div className="p-4">
+        <div className="flex items-start justify-between">
+          <div className="flex-1">
+            <h3 className="text-lg font-semibold text-gray-900 mb-1">
+              {category.name}
+            </h3>
+            <div className="flex items-center justify-between text-xs text-gray-500">
+              <span>Order: {category.sortOrder}</span>
+              <span>{category.productCount || 0} products</span>
+            </div>
+          </div>
+        </div>
+        <div className="mt-4 flex justify-end space-x-2">
+          <button
+            onClick={() => onEdit(category)}
+            className="p-2 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded"
+          >
+            <PencilIcon className="h-4 w-4" />
+          </button>
+          <button
+            onClick={() => onDelete(category._id)}
+            className="p-2 text-red-600 hover:text-red-800 hover:bg-red-50 rounded"
+          >
+            <TrashIcon className="h-4 w-4" />
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 const AdminDashboard = () => {
   const { section } = useParams();
@@ -26,6 +121,19 @@ const AdminDashboard = () => {
   const [totalProducts, setTotalProducts] = useState(0);
   const [totalCategories, setTotalCategories] = useState(0);
   const [totalActiveProducts, setTotalActiveProducts] = useState(0);
+  const [activeId, setActiveId] = useState(null);
+  const [isDragMode, setIsDragMode] = useState(false);
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 8,
+      },
+    }),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedTag, setSelectedTag] = useState('');
   const [showAddForm, setShowAddForm] = useState(false);
@@ -403,6 +511,66 @@ const AdminDashboard = () => {
     navigate('/');
   };
 
+  const handleDragStart = (event) => {
+    const { active } = event;
+    setActiveId(active.id);
+  };
+
+  const handleDragEnd = async (event) => {
+    const { active, over } = event;
+
+    if (!over) {
+      setActiveId(null);
+      return;
+    }
+
+    if (active.id !== over.id) {
+      const activeIndex = categories.findIndex(cat => cat._id === active.id);
+      const overIndex = categories.findIndex(cat => cat._id === over.id);
+
+      if (activeIndex !== -1 && overIndex !== -1) {
+        const reorderedCategories = arrayMove(categories, activeIndex, overIndex);
+        
+        // Update local state immediately for better UX
+        setCategories(reorderedCategories);
+        
+        // Update sort orders and save to database
+        const updatedCategories = reorderedCategories.map((category, index) => ({
+          ...category,
+          sortOrder: index
+        }));
+        
+        try {
+          await updateCategoriesOrder(updatedCategories);
+        } catch (error) {
+          console.error('Failed to update category order:', error);
+          // Revert on error
+          fetchCategories();
+          setError('Failed to update category order');
+        }
+      }
+    }
+
+    setActiveId(null);
+  };
+
+  const updateCategoriesOrder = async (updatedCategories) => {
+    const orderUpdates = updatedCategories.map(category => ({
+      id: category._id,
+      sortOrder: category.sortOrder
+    }));
+
+    try {
+      const response = await categoryService.updateCategoriesOrder(orderUpdates);
+      if (!response.success) {
+        throw new Error(response.message || 'Failed to update category order');
+      }
+    } catch (error) {
+      console.error('Error updating categories order:', error);
+      throw error;
+    }
+  };
+
   if (authLoading) return <Loading text="Loading..." />;
   if (!isAuthenticated) return null;
 
@@ -642,54 +810,54 @@ const AdminDashboard = () => {
             {/* Categories Grid */}
             {loading ? (
               <Loading text="Loading categories..." />
+            ) : categories.length === 0 ? (
+              <div className="text-center py-12">
+                <TagIcon className="mx-auto h-12 w-12 text-gray-400" />
+                <h3 className="mt-2 text-sm font-medium text-gray-900">No categories</h3>
+                <p className="mt-1 text-sm text-gray-500">Get started by creating your first category.</p>
+              </div>
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                {categories.map((category) => (
-                  <div key={category._id} className="bg-white rounded-lg shadow-md overflow-hidden">
-                    <div className="aspect-w-16 aspect-h-9">
-                      <img
-                        src={category.image.url}
-                        alt={category.name}
-                        className="w-full h-48 object-cover"
-                      />
-                    </div>
-                    <div className="p-4">
-                      <div className="flex items-start justify-between">
-                        <div className="flex-1">
-                          <h3 className="text-lg font-semibold text-gray-900 mb-1">
-                            {category.name}
-                          </h3>
-                          <div className="flex items-center justify-between text-xs text-gray-500">
-                            <span>Order: {category.sortOrder}</span>
-                            <span>{category.productCount || 0} products</span>
-                          </div>
-                        </div>
-                      </div>
-                      <div className="mt-4 flex justify-end space-x-2">
-                        <button
-                          onClick={() => startCategoryEdit(category)}
-                          className="p-2 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded"
-                        >
-                          <PencilIcon className="h-4 w-4" />
-                        </button>
-                        <button
-                          onClick={() => handleDeleteCategory(category._id)}
-                          className="p-2 text-red-600 hover:text-red-800 hover:bg-red-50 rounded"
-                        >
-                          <TrashIcon className="h-4 w-4" />
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                ))}
+              <div>
+                <div className="mb-4 flex items-center justify-between">
+                  <p className="text-sm text-gray-600">
+                    💡 <strong>Tip:</strong> Drag and drop categories to reorder them. Changes are saved automatically.
+                  </p>
+                </div>
                 
-                {categories.length === 0 && (
-                  <div className="col-span-full text-center py-12">
-                    <TagIcon className="mx-auto h-12 w-12 text-gray-400" />
-                    <h3 className="mt-2 text-sm font-medium text-gray-900">No categories</h3>
-                    <p className="mt-1 text-sm text-gray-500">Get started by creating your first category.</p>
-                  </div>
-                )}
+                <DndContext
+                  sensors={sensors}
+                  collisionDetection={closestCenter}
+                  onDragStart={handleDragStart}
+                  onDragEnd={handleDragEnd}
+                >
+                  <SortableContext
+                    items={categories.map(cat => cat._id)}
+                    strategy={rectSortingStrategy}
+                  >
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                      {categories.map((category) => (
+                        <SortableCategoryCard
+                          key={category._id}
+                          category={category}
+                          onEdit={startCategoryEdit}
+                          onDelete={handleDeleteCategory}
+                        />
+                      ))}
+                    </div>
+                  </SortableContext>
+                  
+                  <DragOverlay>
+                    {activeId ? (
+                      <div className="bg-white rounded-lg shadow-lg ring-2 ring-blue-500 ring-opacity-50 opacity-90">
+                        <SortableCategoryCard
+                          category={categories.find(cat => cat._id === activeId)}
+                          onEdit={() => {}}
+                          onDelete={() => {}}
+                        />
+                      </div>
+                    ) : null}
+                  </DragOverlay>
+                </DndContext>
               </div>
             )}
           </div>

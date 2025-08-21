@@ -417,4 +417,46 @@ router.get('/admin/all', authenticateToken, [
   }
 });
 
+// Bulk update categories order (admin only)
+router.put('/admin/reorder', authenticateToken, [
+  body('orderUpdates').isArray(),
+  body('orderUpdates.*.id').isMongoId(),
+  body('orderUpdates.*.sortOrder').isInt({ min: 0 })
+], async (req, res) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid input data',
+        errors: errors.array()
+      });
+    }
+
+    const { orderUpdates } = req.body;
+
+    // Update all categories in bulk
+    const bulkOps = orderUpdates.map(update => ({
+      updateOne: {
+        filter: { _id: update.id },
+        update: { sortOrder: update.sortOrder }
+      }
+    }));
+
+    await Category.bulkWrite(bulkOps);
+
+    res.json({
+      success: true,
+      message: 'Category order updated successfully'
+    });
+
+  } catch (error) {
+    console.error('Update categories order error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Internal server error'
+    });
+  }
+});
+
 module.exports = router; 
