@@ -23,6 +23,9 @@ const AdminDashboard = () => {
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [totalProducts, setTotalProducts] = useState(0);
+  const [totalCategories, setTotalCategories] = useState(0);
+  const [totalActiveProducts, setTotalActiveProducts] = useState(0);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedTag, setSelectedTag] = useState('');
   const [showAddForm, setShowAddForm] = useState(false);
@@ -51,7 +54,9 @@ const AdminDashboard = () => {
 
   useEffect(() => {
     if (isAuthenticated) {
-      if (currentSection === 'categories') {
+      if (currentSection === 'overview') {
+        fetchOverviewStats();
+      } else if (currentSection === 'categories') {
         fetchCategories();
       } else {
         fetchProducts();
@@ -60,6 +65,37 @@ const AdminDashboard = () => {
       }
     }
   }, [isAuthenticated, searchTerm, selectedTag, currentSection]);
+
+  const fetchOverviewStats = async () => {
+    try {
+      setLoading(true);
+      
+      // Fetch total products count
+      const productsResponse = await productService.getAdminProducts({ limit: 1 });
+      if (productsResponse.success && productsResponse.data.pagination) {
+        setTotalProducts(productsResponse.data.pagination.total);
+      }
+      
+      // Fetch active products count 
+      const activeProductsResponse = await productService.getAdminProducts({ status: 'active', limit: 1 });
+      if (activeProductsResponse.success && activeProductsResponse.data.pagination) {
+        setTotalActiveProducts(activeProductsResponse.data.pagination.total);
+      }
+      
+      // Fetch total categories count
+      const categoriesResponse = await categoryService.getAdminCategories({ limit: 1 });
+      if (categoriesResponse.success && categoriesResponse.data.pagination) {
+        setTotalCategories(categoriesResponse.data.pagination.total);
+      }
+      
+      setError(null);
+    } catch (err) {
+      console.error('Error fetching overview stats:', err);
+      setError('Failed to fetch overview statistics');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const fetchProducts = async () => {
     try {
@@ -141,6 +177,10 @@ const AdminDashboard = () => {
         setShowAddForm(false);
         resetForm();
         fetchProducts();
+        // Refresh overview stats if needed
+        if (currentSection === 'overview') {
+          fetchOverviewStats();
+        }
         setError(null);
       } else {
         setError(response.message || 'Failed to create product');
@@ -180,6 +220,10 @@ const AdminDashboard = () => {
         setShowAddForm(false);
         resetCategoryForm();
         fetchCategories();
+        // Refresh overview stats if needed
+        if (currentSection === 'overview') {
+          fetchOverviewStats();
+        }
         setError(null);
       } else {
         setError(response.message || 'Failed to create category');
@@ -220,6 +264,10 @@ const AdminDashboard = () => {
         setEditingProduct(null);
         resetForm();
         fetchProducts();
+        // Refresh overview stats if needed
+        if (currentSection === 'overview') {
+          fetchOverviewStats();
+        }
         setError(null);
       } else {
         setError(response.message || 'Failed to update product');
@@ -246,6 +294,10 @@ const AdminDashboard = () => {
         setEditingCategory(null);
         resetCategoryForm();
         fetchCategories();
+        // Refresh overview stats if needed
+        if (currentSection === 'overview') {
+          fetchOverviewStats();
+        }
         setError(null);
       } else {
         setError(response.message || 'Failed to update category');
@@ -265,6 +317,10 @@ const AdminDashboard = () => {
       const response = await productService.deleteProduct(productId);
       if (response.success) {
         fetchProducts();
+        // Refresh overview stats if needed
+        if (currentSection === 'overview') {
+          fetchOverviewStats();
+        }
         setError(null);
       } else {
         setError(response.message || 'Failed to delete product');
@@ -284,6 +340,10 @@ const AdminDashboard = () => {
       const response = await categoryService.deleteCategory(categoryId);
       if (response.success) {
         fetchCategories();
+        // Refresh overview stats if needed
+        if (currentSection === 'overview') {
+          fetchOverviewStats();
+        }
         setError(null);
       } else {
         setError(response.message || 'Failed to delete category');
@@ -430,7 +490,7 @@ const AdminDashboard = () => {
                   <div className="ml-5 w-0 flex-1">
                     <dl>
                       <dt className="text-sm font-medium text-gray-500 truncate">Total Categories</dt>
-                      <dd className="text-lg font-medium text-gray-900">{categories.length}</dd>
+                      <dd className="text-lg font-medium text-gray-900">{totalCategories}</dd>
                     </dl>
                   </div>
                 </div>
@@ -448,7 +508,7 @@ const AdminDashboard = () => {
                   <div className="ml-5 w-0 flex-1">
                     <dl>
                       <dt className="text-sm font-medium text-gray-500 truncate">Total Products</dt>
-                      <dd className="text-lg font-medium text-gray-900">{products.length}</dd>
+                      <dd className="text-lg font-medium text-gray-900">{totalProducts}</dd>
                     </dl>
                   </div>
                 </div>
@@ -467,7 +527,7 @@ const AdminDashboard = () => {
                     <dl>
                       <dt className="text-sm font-medium text-gray-500 truncate">Active Products</dt>
                       <dd className="text-lg font-medium text-gray-900">
-                        {products.filter(p => p.isActive).length}
+                        {totalActiveProducts}
                       </dd>
                     </dl>
                   </div>
@@ -659,8 +719,10 @@ const AdminDashboard = () => {
                     className="px-3 py-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
                   >
                     <option value="">All Categories</option>
-                    {Array.from(new Set(products.map(p => p.tag))).map(tag => (
-                      <option key={tag} value={tag} className="capitalize">{tag}</option>
+                    {categories.map(category => (
+                      <option key={category._id} value={category.name.toLowerCase().replace(/\s+/g, '-')} className="capitalize">
+                        {category.name}
+                      </option>
                     ))}
                   </select>
                 </div>
