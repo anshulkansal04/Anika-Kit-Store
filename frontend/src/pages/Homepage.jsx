@@ -13,6 +13,19 @@ import {
   StarIcon
 } from '@heroicons/react/24/outline';
 
+const CategoryCardSkeleton = () => (
+  <div className="card animate-pulse">
+    <div className="h-56 w-full bg-gradient-to-br from-primary-100 to-secondary-100" />
+    <div className="p-6">
+      <div className="h-6 bg-gray-200 rounded-lg w-3/4 mb-3" />
+      <div className="flex items-center justify-between">
+        <div className="h-8 bg-gray-100 rounded-full w-28" />
+        <div className="h-4 bg-gray-100 rounded w-16" />
+      </div>
+    </div>
+  </div>
+);
+
 const CategoryCard = ({ category }) => {
   return (
     <Link
@@ -322,7 +335,13 @@ const Homepage = () => {
               </p>
             </div>
 
-            {categories.length > 0 ? (
+            {loading ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
+                {Array.from({ length: 8 }).map((_, i) => (
+                  <CategoryCardSkeleton key={i} />
+                ))}
+              </div>
+            ) : categories.length > 0 ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
                 {categories.map((category, index) => (
                   <div key={category._id} style={{ animationDelay: `${index * 0.1}s` }}>
