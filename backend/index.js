@@ -1,6 +1,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
+const cookieParser = require('cookie-parser');
 const compression = require('compression');
 const dotenv = require('dotenv');
 
@@ -37,6 +38,7 @@ const corsOptions = {
 // Middleware
 app.use(cors(corsOptions));
 app.disable('x-powered-by');
+app.use(cookieParser());
 app.use(compression());
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));

@@ -4,15 +4,7 @@ const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000
 
 const productAPI = axios.create({
   baseURL: `${API_BASE_URL}api/products`,
-});
-
-// Add token to requests if available
-productAPI.interceptors.request.use((config) => {
-  const token = localStorage.getItem('admin_token');
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
-  return config;
+  withCredentials: true,
 });
 
 export const productService = {

@@ -112,7 +112,8 @@ const SortableCategoryCard = ({ category, onEdit, onDelete }) => {
 const AdminDashboard = () => {
   const { section } = useParams();
   const navigate = useNavigate();
-  const { admin, logout, isAuthenticated, loading: authLoading } = useAuth();
+  const { admin, logout, isAuthenticated, loading: authLoading, verifySession } = useAuth();
+  const [sessionChecked, setSessionChecked] = useState(false);
   
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
@@ -155,10 +156,15 @@ const AdminDashboard = () => {
   const currentSection = section || 'overview';
 
   useEffect(() => {
-    if (!authLoading && !isAuthenticated) {
-      navigate('/admin/login');
+    if (isAuthenticated) {
+      setSessionChecked(true);
+      return;
     }
-  }, [isAuthenticated, authLoading, navigate]);
+    verifySession().then((valid) => {
+      setSessionChecked(true);
+      if (!valid) navigate('/admin/login');
+    });
+  }, [isAuthenticated, verifySession, navigate]);
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -571,7 +577,7 @@ const AdminDashboard = () => {
     }
   };
 
-  if (authLoading) return <Loading text="Loading..." />;
+  if (authLoading || !sessionChecked) return <Loading text="Loading..." />;
   if (!isAuthenticated) return null;
 
   return (

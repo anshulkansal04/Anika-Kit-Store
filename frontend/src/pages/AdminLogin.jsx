@@ -10,14 +10,18 @@ const AdminLogin = () => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   
-  const { login, isAuthenticated } = useAuth();
+  const { login, isAuthenticated, verifySession } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
     if (isAuthenticated) {
       navigate('/admin/dashboard');
+      return;
     }
-  }, [isAuthenticated, navigate]);
+    verifySession().then((valid) => {
+      if (valid) navigate('/admin/dashboard');
+    });
+  }, [isAuthenticated, verifySession, navigate]);
 
   const handleChange = (e) => {
     setFormData({

@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect } from 'react';
+import { createContext, useContext, useState, useCallback } from 'react';
 import { authService } from '../services/authService';
 
 const AuthContext = createContext();
@@ -13,45 +13,35 @@ export const useAuth = () => {
 
 export const AuthProvider = ({ children }) => {
   const [admin, setAdmin] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [token, setToken] = useState(localStorage.getItem('admin_token'));
+  const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    const initializeAuth = async () => {
-      if (token) {
-        try {
-          const response = await authService.verifyToken();
-          if (response.success) {
-            setAdmin(response.data.admin);
-          } else {
-            // Token is invalid, remove it
-            localStorage.removeItem('admin_token');
-            setToken(null);
-          }
-        } catch (error) {
-          console.error('Token verification failed:', error);
-          localStorage.removeItem('admin_token');
-          setToken(null);
-        }
+  // Call this only from admin pages to check if a session cookie is valid
+  const verifySession = useCallback(async () => {
+    setLoading(true);
+    try {
+      const response = await authService.verifyToken();
+      if (response.success) {
+        setAdmin(response.data.admin);
+        return true;
       }
+      setAdmin(null);
+      return false;
+    } catch {
+      setAdmin(null);
+      return false;
+    } finally {
       setLoading(false);
-    };
-
-    initializeAuth();
-  }, [token]);
+    }
+  }, []);
 
   const login = async (email, password) => {
     try {
       const response = await authService.login(email, password);
       if (response.success) {
-        const { token: newToken, admin: adminData } = response.data;
-        localStorage.setItem('admin_token', newToken);
-        setToken(newToken);
-        setAdmin(adminData);
+        setAdmin(response.data.admin);
         return { success: true };
-      } else {
-        return { success: false, message: response.message };
       }
+      return { success: false, message: response.message };
     } catch (error) {
       console.error('Login error:', error);
       return { 
@@ -61,9 +51,12 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const logout = () => {
-    localStorage.removeItem('admin_token');
-    setToken(null);
+  const logout = async () => {
+    try {
+      await authService.logout();
+    } catch {
+      // Cookie might already be expired — ignore
+    }
     setAdmin(null);
   };
 
@@ -71,14 +64,10 @@ export const AuthProvider = ({ children }) => {
     try {
       const response = await authService.register(name, email, password);
       if (response.success) {
-        const { token: newToken, admin: adminData } = response.data;
-        localStorage.setItem('admin_token', newToken);
-        setToken(newToken);
-        setAdmin(adminData);
+        setAdmin(response.data.admin);
         return { success: true };
-      } else {
-        return { success: false, message: response.message };
       }
+      return { success: false, message: response.message };
     } catch (error) {
       console.error('Registration error:', error);
       return { 
@@ -90,11 +79,11 @@ export const AuthProvider = ({ children }) => {
 
   const value = {
     admin,
-    token,
     loading,
     login,
     logout,
     register,
+    verifySession,
     isAuthenticated: !!admin
   };
 

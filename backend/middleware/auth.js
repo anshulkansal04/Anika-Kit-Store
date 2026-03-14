@@ -1,11 +1,16 @@
 const jwt = require('jsonwebtoken');
 const Admin = require('../models/Admin');
 
-// Middleware to verify JWT token
+const extractToken = (req) => {
+  if (req.cookies?.admin_session) return req.cookies.admin_session;
+  const authHeader = req.headers.authorization;
+  if (authHeader?.startsWith('Bearer ')) return authHeader.split(' ')[1];
+  return null;
+};
+
 const authenticateToken = async (req, res, next) => {
   try {
-    const authHeader = req.headers.authorization;
-    const token = authHeader && authHeader.split(' ')[1]; // Bearer TOKEN
+    const token = extractToken(req);
 
     if (!token) {
       return res.status(401).json({ 
@@ -52,11 +57,9 @@ const authenticateToken = async (req, res, next) => {
   }
 };
 
-// Optional authentication (for routes that can work with or without auth)
 const optionalAuth = async (req, res, next) => {
   try {
-    const authHeader = req.headers.authorization;
-    const token = authHeader && authHeader.split(' ')[1];
+    const token = extractToken(req);
 
     if (token) {
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
@@ -69,7 +72,6 @@ const optionalAuth = async (req, res, next) => {
     
     next();
   } catch (error) {
-    // Continue without authentication for optional auth
     next();
   }
 };

@@ -6,13 +6,23 @@ const { authenticateToken } = require('../middleware/auth');
 
 const router = express.Router();
 
-// Generate JWT token
+const COOKIE_MAX_AGE = 7 * 24 * 60 * 60 * 1000; // 7 days
+
 const generateToken = (adminId) => {
   return jwt.sign(
     { id: adminId },
     process.env.JWT_SECRET,
     { expiresIn: process.env.JWT_EXPIRES_IN || '7d' }
   );
+};
+
+const setTokenCookie = (res, token) => {
+  res.cookie('admin_session', token, {
+    httpOnly: true,
+    secure: true,
+    sameSite: 'none',
+    maxAge: COOKIE_MAX_AGE,
+  });
 };
 
 // Admin Login
@@ -59,14 +69,13 @@ router.post('/login', [
       });
     }
 
-    // Generate token
     const token = generateToken(admin._id);
+    setTokenCookie(res, token);
 
     res.json({
       success: true,
       message: 'Login successful',
       data: {
-        token,
         admin: {
           id: admin._id,
           name: admin.name,
@@ -123,14 +132,13 @@ router.post('/register', [
 
     await admin.save();
 
-    // Generate token
     const token = generateToken(admin._id);
+    setTokenCookie(res, token);
 
     res.status(201).json({
       success: true,
       message: 'Admin registered successfully',
       data: {
-        token,
         admin: {
           id: admin._id,
           name: admin.name,
@@ -189,8 +197,12 @@ router.get('/verify', authenticateToken, (req, res) => {
   });
 });
 
-// Logout (client-side token removal)
 router.post('/logout', (req, res) => {
+  res.clearCookie('admin_session', {
+    httpOnly: true,
+    secure: true,
+    sameSite: 'none',
+  });
   res.json({
     success: true,
     message: 'Logged out successfully'
