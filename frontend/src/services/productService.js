@@ -1,11 +1,6 @@
-import axios from 'axios';
+import { createAPIClient } from './apiClient';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/';
-
-const productAPI = axios.create({
-  baseURL: `${API_BASE_URL}api/products`,
-  withCredentials: true,
-});
+const productAPI = createAPIClient('api/products');
 
 export const productService = {
   // Public routes

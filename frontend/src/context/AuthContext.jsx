@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useCallback } from 'react';
 import { authService } from '../services/authService';
+import { setAccessToken, clearAccessToken } from '../services/apiClient';
 
 const AuthContext = createContext();
 
@@ -38,6 +39,7 @@ export const AuthProvider = ({ children }) => {
     try {
       const response = await authService.login(email, password);
       if (response.success) {
+        if (response.data.token) setAccessToken(response.data.token);
         setAdmin(response.data.admin);
         return { success: true };
       }
@@ -57,6 +59,7 @@ export const AuthProvider = ({ children }) => {
     } catch {
       // Cookie might already be expired — ignore
     }
+    clearAccessToken();
     setAdmin(null);
   };
 
@@ -64,6 +67,7 @@ export const AuthProvider = ({ children }) => {
     try {
       const response = await authService.register(name, email, password);
       if (response.success) {
+        if (response.data.token) setAccessToken(response.data.token);
         setAdmin(response.data.admin);
         return { success: true };
       }

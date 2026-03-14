@@ -76,6 +76,7 @@ router.post('/login', [
       success: true,
       message: 'Login successful',
       data: {
+        token,
         admin: {
           id: admin._id,
           name: admin.name,
@@ -139,6 +140,7 @@ router.post('/register', [
       success: true,
       message: 'Admin registered successfully',
       data: {
+        token,
         admin: {
           id: admin._id,
           name: admin.name,

@@ -1,12 +1,6 @@
-import axios from 'axios';
+import { createAPIClient } from './apiClient';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/';
-
-const authAPI = axios.create({
-  baseURL: `${API_BASE_URL}api/auth`,
-  headers: { 'Content-Type': 'application/json' },
-  withCredentials: true,
-});
+const authAPI = createAPIClient('api/auth', { 'Content-Type': 'application/json' });
 
 export const authService = {
   login: async (email, password) => {
