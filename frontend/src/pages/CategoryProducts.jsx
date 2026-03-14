@@ -295,7 +295,7 @@ const CategoryProducts = () => {
               <div className="text-center">
                 <button
                   onClick={loadMoreProducts}
-                  className="btn-primary text-lg px-8 py-4"
+                  className="inline-flex items-center justify-center btn-primary sm:text-lg text-sm px-8 py-4"
                 >
                   <SparklesIcon className="h-5 w-5 mr-2" />
                   Load More Amazing Products
