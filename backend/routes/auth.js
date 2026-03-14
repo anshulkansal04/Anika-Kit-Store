@@ -188,10 +188,7 @@ router.get('/verify', authenticateToken, (req, res) => {
     message: 'Token is valid',
     data: {
       admin: {
-        id: req.admin._id,
         name: req.admin.name,
-        email: req.admin.email,
-        role: req.admin.role
       }
     }
   });
