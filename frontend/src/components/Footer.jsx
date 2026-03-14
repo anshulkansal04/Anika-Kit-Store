@@ -103,20 +103,20 @@ const Footer = () => {
               <h4 className="text-gray-800 font-bold text-base">Visit Our Store</h4>
             </div>
             
-            <a
-              href="https://www.google.com/maps/place/Anika+Kit+Store/@29.151838,75.725725,19z"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="block bg-white/60 backdrop-blur-sm rounded-lg p-4 shadow-soft hover:shadow-medium transition-all duration-300 group"
-            >
-              <div className="flex items-center justify-center space-x-2 text-primary-600 group-hover:text-primary-700 font-semibold text-sm">
-                <MapPinIcon className="h-5 w-5" />
-                <span>Get Directions on Google Maps</span>
-                <svg className="w-4 h-4 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                </svg>
+            <div className="bg-white/60 backdrop-blur-sm rounded-lg p-1 shadow-soft">
+              <div className="w-full h-28 rounded-md overflow-hidden">
+                <iframe
+                  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d307.9834916906168!2d75.72572547017694!3d29.151837810968452!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3912339098e4ca3b%3A0xb017c269502c9bd6!2sAnika%20Kit%20Store!5e0!3m2!1sen!2sin!4v1753513505837!5m2!1sen!2sin"
+                  width="100%"
+                  height="100%"
+                  style={{ border: 0 }}
+                  allowFullScreen=""
+                  loading="lazy"
+                  referrerPolicy="no-referrer-when-downgrade"
+                  title="Anika Kit Store Location"
+                />
               </div>
-            </a>
+            </div>
 
             {/* Social Links */}
             <div className="flex items-center justify-center space-x-3">
@@ -214,20 +214,20 @@ const Footer = () => {
               <h4 className="text-gray-800 font-bold text-base lg:text-lg">Visit Our Store</h4>
             </div>
             
-            <a
-              href="https://www.google.com/maps/place/Anika+Kit+Store/@29.151838,75.725725,19z"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="block bg-white/60 backdrop-blur-sm rounded-lg p-4 shadow-soft hover:shadow-medium transition-all duration-300 group"
-            >
-              <div className="flex items-center justify-center md:justify-start space-x-2 text-primary-600 group-hover:text-primary-700 font-semibold text-sm">
-                <MapPinIcon className="h-5 w-5" />
-                <span>Get Directions on Google Maps</span>
-                <svg className="w-4 h-4 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                </svg>
+            <div className="bg-white/60 backdrop-blur-sm rounded-lg p-1 shadow-soft">
+              <div className="w-full h-28 lg:h-36 rounded-md overflow-hidden">
+                <iframe
+                  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d307.9834916906168!2d75.72572547017694!3d29.151837810968452!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3912339098e4ca3b%3A0xb017c269502c9bd6!2sAnika%20Kit%20Store!5e0!3m2!1sen!2sin!4v1753513505837!5m2!1sen!2sin"
+                  width="100%"
+                  height="100%"
+                  style={{ border: 0 }}
+                  allowFullScreen=""
+                  loading="lazy"
+                  referrerPolicy="no-referrer-when-downgrade"
+                  title="Anika Kit Store Location"
+                />
               </div>
-            </a>
+            </div>
 
             {/* Social Links */}
             <div className="flex items-center justify-center md:justify-start space-x-3">
