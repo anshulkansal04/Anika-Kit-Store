@@ -154,8 +154,11 @@ const Homepage = () => {
           <div className="flex justify-between items-center">
             <div className="flex items-center space-x-2 sm:space-x-4">
               <img 
-                src="/logo.png" 
+                src="/logo.webp" 
                 alt="Anika Kit Store" 
+                width={670}
+                height={670}
+                fetchPriority="high"
                 className="h-8 sm:h-10 lg:h-12 w-auto"
               />
               <div className="min-w-0 flex-1">
