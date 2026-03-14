@@ -1,8 +1,6 @@
-import { useState } from 'react';
 import { MagnifyingGlassIcon, SparklesIcon } from '@heroicons/react/24/outline';
 
-const SearchBar = ({ onSearch, isLoading }) => {
-  const [searchTerm, setSearchTerm] = useState('');
+const SearchBar = ({ onSearch, isLoading, searchTerm, setSearchTerm }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();

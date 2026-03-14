@@ -93,6 +93,7 @@ const Homepage = () => {
   const [error, setError] = useState(null);
   const [searchResults, setSearchResults] = useState(null);
   const [isSearching, setIsSearching] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
 
   useEffect(() => {
     fetchCategories();
@@ -118,8 +119,10 @@ const Homepage = () => {
     }
   };
 
-  const handleSearch = async (searchTerm) => {
-    if (!searchTerm.trim()) {
+  const handleSearch = async (term) => {
+    setSearchTerm(term);
+
+    if (!term.trim()) {
       setSearchResults(null);
       setIsSearching(false);
       return;
@@ -127,7 +130,7 @@ const Homepage = () => {
 
     try {
       setIsSearching(true);
-      const response = await productService.searchProducts(searchTerm, { limit: 20 });
+      const response = await productService.searchProducts(term, { limit: 20 });
       if (response.success) {
         setSearchResults(response.data.products);
       } else {
@@ -240,7 +243,12 @@ const Homepage = () => {
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Search Section */}
         <div className="mb-12">
-          <SearchBar onSearch={handleSearch} isLoading={isSearching} />
+        <SearchBar
+          onSearch={handleSearch}
+          isLoading={isSearching}
+          searchTerm={searchTerm}
+          setSearchTerm={setSearchTerm}
+        />
         </div>
 
         {/* Search Results */}
@@ -255,6 +263,7 @@ const Homepage = () => {
                 onClick={() => {
                   setSearchResults(null);
                   setIsSearching(false);
+                  setSearchTerm('');
                 }}
                 className="btn-outline text-sm px-4 py-2"
               >
@@ -278,7 +287,10 @@ const Homepage = () => {
                 </div>
                 <p className="text-gray-400 mb-6">Try searching for toys, gifts, accessories, or browse our categories</p>
                 <button
-                  onClick={() => setSearchResults(null)}
+                onClick={() => {
+                  setSearchResults(null);
+                  setSearchTerm('');
+                }}
                   className="btn-primary"
                 >
                   Browse Categories
