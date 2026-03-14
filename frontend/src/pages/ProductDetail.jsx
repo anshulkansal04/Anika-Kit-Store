@@ -172,8 +172,10 @@ const ProductDetail = () => {
               >
                 <ArrowLeftIcon className="h-3 w-3 sm:h-4 sm:w-4" />
                 <img 
-                  src="/logo.png" 
+                  src="/logo.webp" 
                   alt="Anika Kit Store" 
+                  width={670}
+                  height={670}
                   className="h-6 sm:h-8 w-auto"
                 />
                 <span className="gradient-text font-bold text-sm sm:text-base hidden sm:inline">
