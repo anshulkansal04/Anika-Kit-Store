@@ -5,41 +5,97 @@
 @layer base {
   html {
     font-family: 'Inter', system-ui, sans-serif;
+    scroll-behavior: smooth;
   }
-  
+
   body {
-    @apply bg-gradient-to-br from-warm-50 to-primary-50;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
+    @apply bg-surface text-neutral-900 antialiased;
+  }
+
+  /* Heading defaults use Outfit */
+  h1, h2, h3, h4 {
+    font-family: 'Outfit', system-ui, sans-serif;
+  }
+
+  /* Focus-visible for keyboard accessibility */
+  *:focus-visible {
+    @apply outline-2 outline-offset-2 outline-primary-500;
   }
 }
 
 @layer components {
+  /* ── Buttons ── */
   .btn-primary {
-    @apply bg-primary-500 hover:bg-primary-600 text-white font-medium px-6 py-3 rounded-xl transition-all duration-300 shadow-soft hover:shadow-medium transform hover:-translate-y-0.5;
+    @apply bg-primary-500 text-white font-semibold px-6 py-3 rounded-full
+           transition-all duration-200 ease-out-quart
+           shadow-ambient-low hover:bg-primary-600 hover:shadow-ambient-high;
   }
-  
+  .btn-primary:active {
+    transform: scale(0.98);
+  }
+
   .btn-secondary {
-    @apply bg-secondary-500 hover:bg-secondary-600 text-white font-medium px-6 py-3 rounded-xl transition-all duration-300 shadow-soft hover:shadow-medium transform hover:-translate-y-0.5;
+    @apply bg-accent-500 text-white font-semibold px-6 py-3 rounded-full
+           transition-all duration-200 ease-out-quart
+           shadow-ambient-low hover:bg-accent-600 hover:shadow-ambient-high;
   }
-  
+  .btn-secondary:active {
+    transform: scale(0.98);
+  }
+
   .btn-outline {
-    @apply border-2 border-primary-500 text-primary-500 hover:bg-primary-500 hover:text-white font-medium px-6 py-3 rounded-xl transition-all duration-300 transform hover:-translate-y-0.5;
+    @apply border-2 border-primary-500 text-primary-600 font-semibold px-6 py-3 rounded-full
+           transition-all duration-200 ease-out-quart
+           hover:bg-primary-500 hover:text-white;
   }
-  
+  .btn-outline:active {
+    transform: scale(0.98);
+  }
+
+  /* ── Cards ── */
   .card {
-    @apply bg-white rounded-2xl shadow-soft hover:shadow-medium transition-all duration-300 overflow-hidden;
+    @apply bg-surface-elevated rounded-[1rem] shadow-ambient-low overflow-hidden
+           border border-transparent transition-all duration-300 ease-out-quart;
   }
-  
+
   .card-hover {
-    @apply transform hover:-translate-y-1 hover:shadow-large;
+    @apply hover:shadow-ambient-high;
   }
-  
-  .gradient-text {
-    @apply bg-gradient-to-r from-primary-500 to-secondary-500 bg-clip-text text-transparent;
+  @media (hover: hover) and (pointer: fine) {
+    .card-hover:hover {
+      border-color: rgba(0, 0, 0, 0.06);
+    }
   }
-  
-  .glass-effect {
-    @apply bg-white/80 backdrop-blur-sm border border-white/20;
+
+  /* ── Glass Panel (Header) ── */
+  .glass-panel {
+    background: rgba(253, 252, 250, 0.82);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+  }
+
+  /* ── Shimmer Skeleton ── */
+  .shimmer-loader {
+    background: linear-gradient(90deg, #F5F0E8 25%, #EDE8DF 50%, #F5F0E8 75%);
+    background-size: 200% 100%;
+    animation: shimmer 2s infinite linear;
+  }
+
+  /* ── Scrollbar hiding ── */
+  .hide-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .hide-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+}
+
+/* ── Reduced Motion ── */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
   }
 }

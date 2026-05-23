@@ -1,0 +1,346 @@
+<!DOCTYPE html><html class="light" lang="en" style=""><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Storage &amp; Organization - Anika Kit Store</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Literata:ital,opsz,wght@0,7..72,200..900;1,7..72,200..900&amp;family=Be+Vietnam+Pro:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#0f5238",
+                        "secondary-fixed-dim": "#ffb59c",
+                        "primary-container": "#2d6a4f",
+                        "on-background": "#1b1c1c",
+                        "soft-teal": "#52B788",
+                        "surface-bright": "#fbf9f8",
+                        "on-surface": "#1b1c1c",
+                        "surface": "#fbf9f8",
+                        "on-secondary": "#ffffff",
+                        "surface-tint": "#2c694e",
+                        "secondary": "#a43c12",
+                        "on-tertiary-container": "#ddd9d5",
+                        "secondary-fixed": "#ffdbcf",
+                        "on-tertiary-fixed-variant": "#484744",
+                        "on-surface-variant": "#404943",
+                        "on-error-container": "#93000a",
+                        "warm-cream": "#FAF7F2",
+                        "tertiary-fixed-dim": "#c9c6c2",
+                        "outline": "#707973",
+                        "secondary-container": "#fe7e4f",
+                        "tertiary": "#494745",
+                        "on-primary-fixed": "#002114",
+                        "surface-container-low": "#f5f3f3",
+                        "outline-variant": "#bfc9c1",
+                        "on-tertiary-fixed": "#1c1c19",
+                        "surface-container-high": "#eae8e7",
+                        "on-error": "#ffffff",
+                        "on-primary-fixed-variant": "#0e5138",
+                        "primary-fixed": "#b1f0ce",
+                        "on-secondary-fixed": "#380c00",
+                        "on-tertiary": "#ffffff",
+                        "glass-surface": "rgba(255, 255, 255, 0.7)",
+                        "surface-container": "#efeded",
+                        "tertiary-container": "#615f5c",
+                        "primary-fixed-dim": "#95d4b3",
+                        "error": "#ba1a1a",
+                        "inverse-on-surface": "#f2f0f0",
+                        "surface-container-highest": "#e4e2e2",
+                        "on-secondary-fixed-variant": "#822800",
+                        "tertiary-fixed": "#e6e2de",
+                        "sage-haze": "#D8E2DC",
+                        "coral-accent": "#FF8B71",
+                        "inverse-surface": "#303030",
+                        "surface-container-lowest": "#ffffff",
+                        "on-primary-container": "#a8e7c5",
+                        "surface-dim": "#dbd9d9",
+                        "on-primary": "#ffffff",
+                        "background": "#fbf9f8",
+                        "inverse-primary": "#95d4b3",
+                        "on-secondary-container": "#6b1f00",
+                        "error-container": "#ffdad6",
+                        "surface-variant": "#e4e2e2"
+                    },
+                    borderRadius: {
+                        "DEFAULT": "1rem",
+                        "lg": "2rem",
+                        "xl": "3rem",
+                        "full": "9999px"
+                    },
+                    spacing: {
+                        "gutter": "24px",
+                        "base": "8px",
+                        "stack-md": "24px",
+                        "margin-mobile": "16px",
+                        "container-max": "1280px",
+                        "margin-desktop": "48px",
+                        "stack-sm": "12px",
+                        "stack-lg": "48px"
+                    },
+                    fontFamily: {
+                        "display-lg": ["Literata"],
+                        "headline-lg": ["Literata"],
+                        "headline-lg-mobile": ["Literata"],
+                        "label-md": ["Be Vietnam Pro"],
+                        "body-lg": ["Be Vietnam Pro"],
+                        "body-md": ["Be Vietnam Pro"],
+                        "headline-md": ["Literata"],
+                        "caption": ["Be Vietnam Pro"]
+                    },
+                    fontSize: {
+                        "display-lg": ["48px", { lineHeight: "56px", letterSpacing: "-0.02em", fontWeight: "700" }],
+                        "headline-lg": ["32px", { lineHeight: "40px", fontWeight: "600" }],
+                        "headline-lg-mobile": ["28px", { lineHeight: "34px", fontWeight: "600" }],
+                        "label-md": ["14px", { lineHeight: "20px", letterSpacing: "0.05em", fontWeight: "600" }],
+                        "body-lg": ["18px", { lineHeight: "28px", fontWeight: "400" }],
+                        "body-md": ["16px", { lineHeight: "24px", fontWeight: "400" }],
+                        "headline-md": ["24px", { lineHeight: "32px", fontWeight: "500" }],
+                        "caption": ["12px", { lineHeight: "16px", fontWeight: "400" }]
+                    },
+                    boxShadow: {
+                        'ambient-low': '0 4px 15px rgba(15, 82, 56, 0.04)',
+                        'ambient-high': '0 10px 30px rgba(15, 82, 56, 0.08)',
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .glass-panel {
+            background: rgba(250, 247, 242, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background font-body-md antialiased min-h-screen flex flex-col pt-[88px] pb-[80px] md:pb-0">
+<!-- TopNavBar -->
+<header class="fixed top-0 w-full z-50 bg-glass-surface dark:bg-glass-surface backdrop-blur-md shadow-sm dark:shadow-none">
+<div class="flex justify-between items-center px-gutter py-4 max-w-container-max mx-auto">
+<!-- Brand Logo -->
+<a class="font-display-lg text-headline-md text-primary dark:text-primary-fixed font-bold italic tracking-tight" href="#">
+                Anika Kit Store
+            </a>
+<!-- Desktop Navigation -->
+<nav class="hidden md:flex items-center gap-6">
+<a class="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors" href="#">Home</a>
+<a class="font-label-md text-label-md text-primary border-b-2 border-primary font-bold pb-1" href="#">Categories</a>
+<a class="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors" href="#">New Arrivals</a>
+<a class="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors" href="#">Best Sellers</a>
+<a class="font-label-md text-label-md text-on-surface-variant hover:text-primary transition-colors" href="#">Contact</a>
+</nav>
+<!-- Trailing Icons -->
+<div class="flex items-center gap-4">
+
+
+</div>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="flex-grow w-full max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop py-stack-md md:py-stack-lg flex flex-col md:flex-row gap-stack-md">
+<!-- Desktop Sidebar / Mobile Filters Toggle -->
+<aside class="w-full md:w-64 flex-shrink-0">
+<div class="sticky top-[100px]">
+<div class="flex items-center justify-between md:hidden mb-4 glass-panel p-4 rounded-xl shadow-ambient-low">
+<h2 class="font-headline-md text-headline-md text-primary">Storage &amp; Organization</h2>
+
+</div>
+<div class="hidden md:block glass-panel p-6 rounded-xl shadow-ambient-low">
+<h2 class="font-headline-md text-headline-md text-primary mb-6">Discover</h2>
+<div class="space-y-6">
+<div>
+<h3 class="font-label-md text-label-md text-on-surface-variant mb-3 uppercase tracking-wider">Categories</h3>
+<ul class="space-y-3">
+<li class="">
+<label class="flex items-center gap-3 cursor-pointer group">
+<div class="w-5 h-5 rounded border border-outline flex items-center justify-center group-hover:border-coral-accent transition-colors"></div>
+<span class="font-body-md text-body-md text-on-surface group-hover:text-primary transition-colors">Kitchenware</span>
+</label>
+</li>
+<li class="">
+<label class="flex items-center gap-3 cursor-pointer group">
+<div class="w-5 h-5 rounded border border-outline flex items-center justify-center bg-coral-accent border-coral-accent shadow-[0_0_8px_rgba(255,139,113,0.4)] transition-all">
+<span class="material-symbols-outlined text-[14px] text-white">check</span>
+</div>
+<span class="font-body-md text-body-md text-primary font-medium">Storage &amp; Organization</span>
+</label>
+</li>
+<li class="">
+<label class="flex items-center gap-3 cursor-pointer group">
+<div class="w-5 h-5 rounded border border-outline flex items-center justify-center group-hover:border-coral-accent transition-colors"></div>
+<span class="font-body-md text-body-md text-on-surface group-hover:text-primary transition-colors">Dining &amp; Entertaining</span>
+</label>
+</li>
+<li class="">
+<label class="flex items-center gap-3 cursor-pointer group">
+<div class="w-5 h-5 rounded border border-outline flex items-center justify-center group-hover:border-coral-accent transition-colors"></div>
+<span class="font-body-md text-body-md text-on-surface group-hover:text-primary transition-colors">Decor &amp; Accents</span>
+</label>
+</li>
+</ul>
+</div>
+<div>
+<h3 class="font-label-md text-label-md text-on-surface-variant mb-3 uppercase tracking-wider">Price Range</h3>
+<div class="space-y-2">
+<label class="flex items-center gap-3 cursor-pointer group">
+<div class="w-5 h-5 rounded-full border border-outline flex items-center justify-center group-hover:border-coral-accent transition-colors"></div>
+<span class="font-body-md text-body-md text-on-surface">Under ₹500</span>
+</label>
+<label class="flex items-center gap-3 cursor-pointer group">
+<div class="w-5 h-5 rounded-full border border-outline flex items-center justify-center group-hover:border-coral-accent transition-colors"></div>
+<span class="font-body-md text-body-md text-on-surface">₹500 - ₹1500</span>
+</label>
+<label class="flex items-center gap-3 cursor-pointer group">
+<div class="w-5 h-5 rounded-full border border-outline flex items-center justify-center bg-coral-accent border-coral-accent shadow-[0_0_8px_rgba(255,139,113,0.4)] transition-all">
+<div class="w-2 h-2 rounded-full bg-white"></div>
+</div>
+<span class="font-body-md text-body-md text-primary font-medium">₹1500+</span>
+</label>
+</div>
+</div>
+</div>
+</div>
+</div>
+</aside>
+<!-- Product Grid -->
+<div class="flex-grow">
+<!-- Search & Pills (Mobile sticky, Desktop inline) -->
+<div class="mb-stack-md space-y-4">
+<div class="relative w-full">
+<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant">search</span>
+<input class="w-full pl-12 pr-4 py-4 rounded-full bg-warm-cream border-none shadow-inner text-body-md focus:ring-2 focus:ring-primary/20 transition-shadow outline-none placeholder:text-on-surface-variant/60" placeholder="Search curated collections..." type="text">
+</div>
+<div class="flex gap-2 overflow-x-auto hide-scrollbar pb-2"><div class="px-4 py-1.5 rounded-full bg-warm-cream text-on-surface-variant text-caption font-label-md shrink-0">24 Items</div></div>
+</div>
+<!-- Header -->
+<div class="flex justify-between items-end mb-6">
+<div>
+<h1 class="font-headline-lg-mobile md:font-headline-lg text-primary mb-2">Storage &amp; Organization</h1>
+<p class="font-body-md text-on-surface-variant">Thoughtful containment solutions to elevate and organize your living spaces.</p>
+</div>
+<span class="font-caption text-caption text-on-surface-variant hidden md:block">24 Items found</span>
+</div>
+<!-- Uniform Grid -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"><!-- Product Card 1 -->
+<div class="group cursor-pointer h-full">
+<div class="bg-surface rounded-xl overflow-hidden shadow-ambient-low hover:shadow-ambient-high transition-shadow duration-300 relative border border-transparent hover:border-outline-variant/30 flex flex-col h-full">
+<div class="relative bg-warm-cream aspect-square flex items-center justify-center p-4">
+<img alt="" class="w-full h-full object-contain mix-blend-multiply opacity-90 group-hover:scale-105 transition-transform duration-500 ease-out" src="https://lh3.googleusercontent.com/aida/ADBb0ugrnigeUcDqgE09Pgxjulr-gs0bwWpCPxUFneri5ckuWQu85VUKKY7vzyJFfIx4fvZ6Gfb_W1orAL9TWuJOIED-mr3k3_pKrihOaEPucMrwebrmwLQ_HZr6kRZZ2A3BJQ6uhF0J4f6CCysLT1V4PCwu28vk84ImSGCawYyeC227m2_VV8HIWugkWf8lZa9R9gM6PbumabrzZ3a9-ErvvWewlxO6bX1_CdnguYQy4geQ2OUJJ9vKhw2Ypnch">
+</div>
+<div class="p-5 flex-grow flex flex-col justify-between bg-surface">
+<div>
+<span class="font-caption text-caption text-on-surface-variant uppercase tracking-wider mb-1 block">Organization</span>
+<h3 class="font-headline-md text-[18px] text-primary mb-2 font-medium leading-snug">Floral Cotton Storage Bin Set</h3>
+</div>
+<button class="w-full mt-4 py-4 rounded-full bg-sage-haze/50 text-primary font-label-md text-label-md flex items-center justify-center gap-2 hover:bg-sage-haze transition-colors active:scale-[0.98] min-h-[48px]">
+<span class="material-symbols-outlined text-[18px]">chat</span>
+                WhatsApp Enquiry
+            </button>
+</div>
+</div>
+</div>
+<!-- Product Card 2 -->
+<div class="group cursor-pointer h-full">
+<div class="bg-surface rounded-xl overflow-hidden shadow-ambient-low hover:shadow-ambient-high transition-shadow duration-300 relative border border-transparent hover:border-outline-variant/30 flex flex-col h-full">
+<div class="relative bg-warm-cream aspect-square flex items-center justify-center p-4">
+<img alt="" class="w-full h-full object-contain mix-blend-multiply opacity-90 group-hover:scale-105 transition-transform duration-500 ease-out" src="https://lh3.googleusercontent.com/aida/ADBb0uhMJonL6yHCfUlHa7o5N5OiOALha1cLRg9wdOM4Cjnvj9-9swp-W6tylADsGV8SsBJHSYZyFuAQ6ubcMjUKL4ZihwwXJXCgXH4rUh8CkX4Ql65Y6-r6YCvNnpdBnI8QFodVBfdHj8gYAhwyNpAztPYcR5ChjC8VCn1gqnv93ZRxKCxUk9UIN-3w-471BdVMGQQvIZbHpdeP6zpO7zw_5BjBBLRoph6u0U96N9sLjZOv5ooVQ-uplAZ0NM9y">
+</div>
+<div class="p-5 flex-grow flex flex-col justify-between bg-surface">
+<div>
+<span class="font-caption text-caption text-on-surface-variant uppercase tracking-wider mb-1 block">On-The-Go</span>
+<h3 class="font-headline-md text-[18px] text-primary mb-2 font-medium leading-snug">Classic Navy Insulated Tote</h3>
+</div>
+<button class="w-full mt-4 py-4 rounded-full bg-sage-haze/50 text-primary font-label-md text-label-md flex items-center justify-center gap-2 hover:bg-sage-haze transition-colors active:scale-[0.98] min-h-[48px]">
+<span class="material-symbols-outlined text-[18px]">chat</span>
+                WhatsApp Enquiry
+            </button>
+</div>
+</div>
+</div>
+<!-- Product Card 3 -->
+<div class="group cursor-pointer h-full">
+<div class="bg-surface rounded-xl overflow-hidden shadow-ambient-low hover:shadow-ambient-high transition-shadow duration-300 relative border border-transparent hover:border-outline-variant/30 flex flex-col h-full">
+<div class="relative bg-warm-cream aspect-square flex items-center justify-center p-4">
+<img alt="" class="w-full h-full object-contain mix-blend-multiply opacity-90 group-hover:scale-105 transition-transform duration-500 ease-out" src="https://lh3.googleusercontent.com/aida/ADBb0uhE0m47w45vk_Wu6-kIj6lPcMNjOfWIJuJcBEEIpBLFFsasX8yxb4nlbznUsmVa35O8HKrMSsyHd6pwYsCHwNmC8gsttzBy6UDOiD-MJPpmk438F6h9hHyPyAw9kdEsDR3nUr_bNdXLKWm-UrD4FK4RLvtr18EyIYUuc6RSiW84e71QUZUEqYRoBinaQgjSuI79h0eE74Bb11odL-R68IXjCdrCnmdrLo6B-0pHHoOzEJ29dTYG73cTlhQe">
+</div>
+<div class="p-5 flex-grow flex flex-col justify-between bg-surface">
+<div>
+<span class="font-caption text-caption text-on-surface-variant uppercase tracking-wider mb-1 block">Drinkware</span>
+<h3 class="font-headline-md text-[18px] text-primary mb-2 font-medium leading-snug">Ceramic Core Travel Tumbler</h3>
+</div>
+<button class="w-full mt-4 py-4 rounded-full bg-sage-haze/50 text-primary font-label-md text-label-md flex items-center justify-center gap-2 hover:bg-sage-haze transition-colors active:scale-[0.98] min-h-[48px]">
+<span class="material-symbols-outlined text-[18px]">chat</span>
+                WhatsApp Enquiry
+            </button>
+</div>
+</div>
+</div></div>
+<!-- Load More -->
+<div class="mt-8 flex justify-center">
+<button class="px-8 py-3 rounded-full border-2 border-primary text-primary font-label-md text-label-md hover:bg-primary hover:text-white transition-colors duration-300 active:scale-[0.98]">
+                    Load More Inspiration
+                 </button>
+</div>
+</div>
+</main>
+<!-- BottomNavBar (Mobile Only) -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 py-2 bg-surface dark:bg-surface-container-lowest shadow-lg border-t border-outline-variant dark:border-none rounded-t-lg pb-safe">
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-surface-variant hover:bg-surface-container dark:hover:bg-surface-container-high p-2 rounded-xl transition-colors" href="#">
+<span class="material-symbols-outlined mb-1" style="font-variation-settings: &quot;FILL&quot; 0;">explore</span>
+<span class="font-label-md text-caption">Discovery</span>
+</a>
+<a class="flex flex-col items-center justify-center text-primary dark:text-primary-fixed font-bold scale-90 transition-transform duration-150 p-2 rounded-xl" href="#">
+<span class="material-symbols-outlined mb-1" style="font-variation-settings: &quot;FILL&quot; 1;">grid_view</span>
+<span class="font-label-md text-caption">Categories</span>
+</a>
+<a class="flex flex-col items-center justify-center text-on-surface-variant dark:text-surface-variant hover:bg-surface-container dark:hover:bg-surface-container-high p-2 rounded-xl transition-colors" href="#">
+<span class="material-symbols-outlined mb-1" style="font-variation-settings: &quot;FILL&quot; 0;">inventory_2</span>
+<span class="font-label-md text-caption">Products</span>
+</a>
+</nav>
+<!-- Footer -->
+<footer class="w-full py-stack-lg bg-warm-cream dark:bg-surface-container-lowest border-t border-outline-variant mt-auto">
+<div class="max-w-container-max mx-auto px-gutter grid grid-cols-1 md:grid-cols-3 gap-stack-md">
+<!-- Brand -->
+<div class="space-y-4">
+<h3 class="font-display-lg text-headline-md text-secondary-container italic font-bold">Anika Kit Store</h3>
+<p class="font-body-md text-body-md text-on-surface-variant">Thoughtful containment solutions to elevate and organize your living spaces.</p>
+</div>
+<!-- Links -->
+<div class="grid grid-cols-2 gap-4 col-span-1 md:col-span-2">
+<div class="space-y-3 flex flex-col">
+<h4 class="font-label-md text-label-md text-primary uppercase tracking-wider mb-2">Company</h4>
+<a class="font-body-md text-body-md text-on-tertiary-fixed-variant hover:text-primary hover:opacity-80 transition-opacity" href="#">About Us</a>
+<a class="font-body-md text-body-md text-on-tertiary-fixed-variant hover:text-primary hover:opacity-80 transition-opacity" href="#">Contact Us</a>
+<a class="font-body-md text-body-md text-on-tertiary-fixed-variant hover:text-primary hover:opacity-80 transition-opacity" href="#">Store Locations</a>
+</div>
+<div class="space-y-3 flex flex-col">
+<h4 class="font-label-md text-label-md text-primary uppercase tracking-wider mb-2">Legal &amp; Help</h4>
+<a class="font-body-md text-body-md text-on-tertiary-fixed-variant hover:text-primary hover:opacity-80 transition-opacity" href="#">Privacy Policy</a>
+<a class="font-body-md text-body-md text-on-tertiary-fixed-variant hover:text-primary hover:opacity-80 transition-opacity" href="#">Shipping Info</a>
+</div>
+</div>
+</div>
+<div class="max-w-container-max mx-auto px-gutter mt-stack-md pt-6 border-t border-outline-variant/30 text-center">
+<p class="font-caption text-caption text-on-surface-variant">© 2024 Anika Kit Store. You Demand We Fulfil.</p>
+</div>
+</footer>
+<style>
+        /* Safe area padding for mobile nav */
+        .pb-safe {
+            padding-bottom: env(safe-area-inset-bottom);
+        }
+    </style>
+
+
+</body></html>

@@ -1,27 +1,23 @@
 import { useState, useEffect, useRef } from 'react';
-import { useParams, Link, useNavigate } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
 import { productService } from '../services/productService';
-import { categoryService } from '../services/categoryService';
+import { FaWhatsapp } from 'react-icons/fa';
 import Loading from '../components/Loading';
 import Footer from '../components/Footer';
-import { 
-  ShareIcon,
-  TagIcon,
-  InformationCircleIcon,
-  ArrowLeftIcon,
-  SparklesIcon,
-  GiftIcon
-} from '@heroicons/react/24/outline';
+import Header from '../components/Header';
+import ImageContainer from '../components/ui/ImageContainer';
+import Typography from '../components/ui/Typography';
+import ProductCard from '../components/ProductCard';
+import { ShareIcon, ChevronLeftIcon, ChevronRightIcon } from '@heroicons/react/24/outline';
 
 const ProductDetail = () => {
   const { productSlug } = useParams();
-  const navigate = useNavigate();
   const [product, setProduct] = useState(null);
   const [relatedProducts, setRelatedProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
-  const imageContainerRef = useRef(null);
+  const scrollRef = useRef(null);
 
   useEffect(() => {
     fetchProductDetail();
@@ -30,18 +26,14 @@ const ProductDetail = () => {
   const fetchProductDetail = async () => {
     try {
       setLoading(true);
-      
-      // For now, we'll search by slug or name since we don't have a direct slug endpoint
       const searchResponse = await productService.getAllProducts({ search: productSlug.replace(/-/g, ' ') });
       
       if (searchResponse.success && searchResponse.data.products.length > 0) {
-        // Find the product that matches the slug most closely
         const foundProduct = searchResponse.data.products.find(p => 
           p.slug === productSlug || 
           p.name.toLowerCase().replace(/[^a-z0-9]/g, '-').includes(productSlug.split('-')[0])
         ) || searchResponse.data.products[0];
 
-        // Fetch full product details by ID to include fields like SKU/specs
         try {
           const detailResponse = await productService.getProductById(foundProduct._id);
           if (detailResponse.success) {
@@ -53,18 +45,13 @@ const ProductDetail = () => {
           setProduct(foundProduct);
         }
         
-        // Fetch related products from the same category
         if (foundProduct.tag) {
-          const relatedResponse = await productService.getProductsByTag(foundProduct.tag, { limit: 4 });
+          const relatedResponse = await productService.getProductsByTag(foundProduct.tag, { limit: 5 });
           if (relatedResponse.success) {
-            // Filter out the current product
             const filtered = relatedResponse.data.products.filter(p => p._id !== foundProduct._id);
-            setRelatedProducts(filtered.slice(0, 3));
+            setRelatedProducts(filtered.slice(0, 4));
           }
         }
-        
-        // Update view count (this would be handled by the backend in a real app)
-        // await productService.incrementViews(foundProduct._id);
       } else {
         setError('Product not found');
       }
@@ -81,76 +68,36 @@ const ProductDetail = () => {
       try {
         await navigator.share({
           title: product.name,
-          text: product.description,
+          text: product.description || '',
           url: window.location.href,
         });
       } catch (err) {
         console.log('Error sharing:', err);
       }
     } else {
-      // Fallback: copy to clipboard
       navigator.clipboard.writeText(window.location.href);
       alert('Product link copied to clipboard!');
     }
   };
 
-  // Touch/swipe handlers for mobile
-  const handleTouchStart = (e) => {
-    const touch = e.touches[0];
-    imageContainerRef.current.touchStartX = touch.clientX;
-  };
-
-  const handleTouchMove = (e) => {
-    if (!imageContainerRef.current.touchStartX) return;
-    
-    const touch = e.touches[0];
-    const diff = imageContainerRef.current.touchStartX - touch.clientX;
-    
-    // Prevent default scrolling behavior during horizontal swipe
-    if (Math.abs(diff) > 10) {
-      e.preventDefault();
+  const scrollThumbnails = (direction) => {
+    if (scrollRef.current) {
+      const scrollAmount = direction === 'left' ? -200 : 200;
+      scrollRef.current.scrollBy({ left: scrollAmount, behavior: 'smooth' });
     }
-  };
-
-  const handleTouchEnd = (e) => {
-    if (!imageContainerRef.current.touchStartX) return;
-    
-    const touch = e.changedTouches[0];
-    const diff = imageContainerRef.current.touchStartX - touch.clientX;
-    const threshold = 50; // Minimum swipe distance
-    
-    if (Math.abs(diff) > threshold && productImages.length > 1) {
-      if (diff > 0) {
-        // Swipe left - next image
-        setSelectedImageIndex(prev => 
-          prev === productImages.length - 1 ? 0 : prev + 1
-        );
-      } else {
-        // Swipe right - previous image
-        setSelectedImageIndex(prev => 
-          prev === 0 ? productImages.length - 1 : prev - 1
-        );
-      }
-    }
-    
-    imageContainerRef.current.touchStartX = null;
   };
 
   if (loading) return <Loading text="Loading product details..." />;
   
   if (error || !product) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-warm-50 to-primary-50">
-        <div className="text-center card p-12 max-w-md mx-auto">
-          <GiftIcon className="h-16 w-16 text-gray-400 mx-auto mb-4" />
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">Product Not Found</h2>
-          <p className="text-gray-600 mb-6">{error || 'The product you are looking for does not exist.'}</p>
-          <Link
-            to="/"
-            className="btn-primary"
-          >
-            Back to Homepage
-          </Link>
+      <div className="min-h-screen flex items-center justify-center bg-surface p-4">
+        <div className="text-center card p-12 max-w-md mx-auto w-full">
+          <Typography variant="h2" color="error" className="mb-4">Product Not Found</Typography>
+          <Typography variant="body" color="muted" className="mb-6">
+            {error || 'The product you are looking for does not exist.'}
+          </Typography>
+          <Link to="/" className="btn-primary inline-block">Back to Home</Link>
         </div>
       </div>
     );
@@ -158,309 +105,163 @@ const ProductDetail = () => {
 
   const productImages = product.images?.length > 0 ? product.images : [product.image].filter(Boolean);
   const mainImage = productImages[selectedImageIndex] || productImages[0];
+  const whatsappNumber = "918708258249";
+  const whatsappMessage = encodeURIComponent(`Hi, I'm interested in the product: ${product.name}`);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-warm-50 to-primary-50">
-      {/* Header */}
-      <header className="glass-effect sticky top-0 z-50 border-b border-white/10">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 sm:py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-2 sm:space-x-4 min-w-0 flex-1">
-              <Link 
-                to="/" 
-                className="flex items-center space-x-1 sm:space-x-2 text-primary-600 hover:text-primary-800 font-medium transition-colors flex-shrink-0"
-              >
-                <ArrowLeftIcon className="h-3 w-3 sm:h-4 sm:w-4" />
-                <img 
-                  src="/logo.webp" 
-                  alt="Anika Kit Store" 
-                  width={670}
-                  height={670}
-                  className="h-6 sm:h-8 w-auto"
-                />
-                <span className="gradient-text font-bold text-sm sm:text-base hidden sm:inline">
-                  Anika Kit Store
-                </span>
-              </Link>
-              
-              <div className="h-4 sm:h-6 border-l border-gray-300"></div>
-              <nav className="flex items-center space-x-1 sm:space-x-2 text-xs sm:text-sm min-w-0 flex-1">
-                <Link 
-                  to={`/category/${product.categories?.[0]?._id || product.tag}`}
-                  className="text-primary-600 hover:text-primary-800 font-medium capitalize transition-colors truncate"
-                >
-                  {product.categories?.[0]?.name || product.tag}
-                </Link>
-                <span className="text-gray-400">/</span>
-                <span className="text-gray-500 truncate">{product.name}</span>
-              </nav>
-            </div>
-            {/* <Link
-              to="/admin/login"
-              className="btn-outline text-xs sm:text-sm px-2 py-1 sm:px-4 sm:py-2 whitespace-nowrap flex-shrink-0"
-            >
-              <span className="hidden sm:inline">Admin Login</span>
-              <span className="sm:hidden">Admin</span>
-            </Link> */}
-          </div>
-        </div>
-      </header>
+    <div className="min-h-screen flex flex-col bg-surface">
+      <Header showBack={true} />
 
-      {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 mb-16">
-          {/* Product Images */}
-          <div className="space-y-6">
+      <main className="flex-grow w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-12">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 mb-20">
+          
+          {/* Images Section */}
+          <div className="space-y-4 animate-fade-up">
             {/* Main Image */}
-            <div className="card overflow-hidden">
-              <div 
-                ref={imageContainerRef}
-                className="aspect-w-1 aspect-h-1 w-full overflow-hidden bg-gradient-to-br from-warm-100 to-primary-100 relative touch-pan-x"
-                onTouchStart={handleTouchStart}
-                onTouchMove={handleTouchMove}
-                onTouchEnd={handleTouchEnd}
-              >
-                <img
-                  src={mainImage?.url || product.image?.url}
-                  alt={product.name}
-                  className="w-full h-96 object-contain object-center hover:scale-105 transition-transform duration-500"
-                />
-                
-                {/* Mobile swipe indicators */}
-                {/* {productImages.length > 1 && (
-                  <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2 md:hidden">
-                    {productImages.map((_, index) => (
-                      <button
-                        key={index}
-                        onClick={() => setSelectedImageIndex(index)}
-                        className={`w-2 h-2 rounded-full transition-all duration-300 ${
-                          selectedImageIndex === index 
-                            ? 'bg-primary-600 w-6' 
-                            : 'bg-white/60 hover:bg-white/80'
-                        }`}
-                      />
-                    ))}
-                  </div>
-                )} */}
-                
-                {/* Mobile navigation arrows */}
-                {/* {productImages.length > 1 && (
-                  <>
-                    <button
-                      onClick={() => setSelectedImageIndex(prev => 
-                        prev === 0 ? productImages.length - 1 : prev - 1
-                      )}
-                      className="absolute left-2 top-1/2 transform -translate-y-1/2 bg-white/80 hover:bg-white rounded-full p-2 shadow-lg transition-all duration-300 md:hidden"
-                    >
-                      <svg className="w-4 h-4 text-gray-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                      </svg>
-                    </button>
-                    <button
-                      onClick={() => setSelectedImageIndex(prev => 
-                        prev === productImages.length - 1 ? 0 : prev + 1
-                      )}
-                      className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-white/80 hover:bg-white rounded-full p-2 shadow-lg transition-all duration-300 md:hidden"
-                    >
-                      <svg className="w-4 h-4 text-gray-800" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                      </svg>
-                    </button>
-                  </>
-                )} */}
-              </div>
-            </div>
+            <ImageContainer
+              src={mainImage?.url}
+              alt={product.name}
+              aspectRatio="square"
+              className="rounded-2xl border border-neutral-200/50 shadow-ambient-low"
+            />
             
-            {/* Thumbnail Images - Hidden on mobile, shown on desktop */}
+            {/* Thumbnails Row */}
             {productImages.length > 1 && (
-              <div className="hidden md:flex space-x-3 overflow-x-auto pb-2">
-                {productImages.map((image, index) => (
-                  <button
-                    key={index}
-                    onClick={() => setSelectedImageIndex(index)}
-                    className={`flex-shrink-0 w-20 h-20 rounded-xl overflow-hidden border-2 transition-all duration-300 ${
-                      selectedImageIndex === index 
-                        ? 'border-primary-500 shadow-medium transform scale-105' 
-                        : 'border-gray-200 hover:border-gray-300 hover:shadow-soft'
-                    }`}
-                  >
-                    <img
-                      src={image.url}
-                      alt={`${product.name} ${index + 1}`}
-                      className="w-full h-full object-contain"
-                    />
-                  </button>
-                ))}
-              </div>
-            )}
-            
-            {/* Mobile horizontal scroll thumbnails */}
-            {productImages.length > 1 && (
-              <div className="md:hidden">
-                <div className="flex space-x-3 overflow-x-auto pb-2 scrollbar-hide snap-x snap-mandatory">
-                  {productImages.map((image, index) => (
+              <div className="relative group">
+                <button 
+                  onClick={() => scrollThumbnails('left')}
+                  className="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 bg-surface rounded-full shadow-ambient-low items-center justify-center hidden md:group-hover:flex z-10"
+                >
+                  <ChevronLeftIcon className="w-5 h-5 text-neutral-600" />
+                </button>
+                
+                <div 
+                  ref={scrollRef}
+                  className="flex gap-3 overflow-x-auto hide-scrollbar snap-x snap-mandatory py-2 px-1"
+                >
+                  {productImages.map((image, idx) => (
                     <button
-                      key={index}
-                      onClick={() => setSelectedImageIndex(index)}
-                      className={`flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden border-2 transition-all duration-300 snap-start ${
-                        selectedImageIndex === index 
-                          ? 'border-primary-500 shadow-medium transform scale-105' 
-                          : 'border-gray-200 hover:border-gray-300'
+                      key={idx}
+                      onClick={() => setSelectedImageIndex(idx)}
+                      className={`flex-shrink-0 w-20 h-20 rounded-xl overflow-hidden snap-start transition-all duration-200 ${
+                        selectedImageIndex === idx 
+                          ? 'ring-2 ring-primary-500 ring-offset-2' 
+                          : 'opacity-70 hover:opacity-100'
                       }`}
                     >
-                      <img
-                        src={image.url}
-                        alt={`${product.name} ${index + 1}`}
-                        className="w-full h-full object-contain"
-                      />
+                      <div className="w-full h-full bg-surface-warm p-2">
+                        <img src={image.url} alt="thumbnail" className="w-full h-full object-contain mix-blend-multiply" />
+                      </div>
                     </button>
                   ))}
                 </div>
+
+                <button 
+                  onClick={() => scrollThumbnails('right')}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 bg-surface rounded-full shadow-ambient-low items-center justify-center hidden md:group-hover:flex z-10"
+                >
+                  <ChevronRightIcon className="w-5 h-5 text-neutral-600" />
+                </button>
               </div>
             )}
           </div>
 
-          {/* Product Information */}
-          <div className="space-y-8">
+          {/* Product Info Section */}
+          <div className="space-y-8 animate-fade-up" style={{ animationDelay: '100ms' }}>
             <div>
-              <div className="flex items-center space-x-3 mb-4">
-                <span className="inline-flex items-center px-3 py-1.5 rounded-full text-sm font-medium bg-gradient-to-r from-primary-100 to-secondary-100 text-primary-700 capitalize">
-                  <TagIcon className="h-4 w-4 mr-1" />
-                  {product.categories?.[0]?.name || product.tag}
-                </span>
-                {product.featured && (
-                  <span className="inline-flex items-center px-3 py-1.5 rounded-full text-sm font-medium bg-gradient-to-r from-warm-100 to-accent-100 text-warm-700">
-                    <SparklesIcon className="h-4 w-4 mr-1" />
-                    Featured
-                  </span>
-                )}
-              </div>
+              <Typography variant="overline" color="muted" className="mb-3 block">
+                {product.categories?.[0]?.name || product.tag || 'Product'}
+              </Typography>
               
-              <h1 className="text-4xl font-bold text-gray-900 mb-4">{product.name}</h1>
+              <Typography variant="h1" className="mb-4">{product.name}</Typography>
               
               {product.description && (
-                <p className="text-lg text-gray-600 leading-relaxed">{product.description}</p>
+                <Typography variant="body-lg" color="secondary" className="leading-relaxed">
+                  {product.description}
+                </Typography>
               )}
             </div>
 
-            {/* Product Details */}
-            {(product.specifications?.length > 0 || product.features?.length > 0) && (
-              <div className="space-y-6">
-                {product.specifications?.length > 0 && (
-                  <div className="card p-6">
-                    <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-                      <InformationCircleIcon className="h-5 w-5 mr-2 text-primary-500" />
-                      Specifications
-                    </h3>
-                    <dl className="grid grid-cols-1 gap-4">
-                      {product.specifications.map((spec, index) => (
-                        <div key={index} className="flex justify-between py-3 border-b border-gray-100 last:border-b-0">
-                          <dt className="text-sm font-medium text-gray-600">{spec.name}</dt>
-                          <dd className="text-sm text-gray-900 font-medium">{spec.value}</dd>
-                        </div>
-                      ))}
-                    </dl>
-                  </div>
-                )}
+            {/* CTAs */}
+            <div className="flex flex-col sm:flex-row gap-4 pt-4 border-t border-neutral-200/50">
+              <a
+                href={`https://wa.me/${whatsappNumber}?text=${whatsappMessage}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex-1 flex items-center justify-center gap-2 bg-green-500 hover:bg-green-600 text-white font-semibold py-4 px-6 rounded-full shadow-ambient-low hover:shadow-ambient-high transition-all active:scale-[0.98]"
+              >
+                <FaWhatsapp className="w-6 h-6" />
+                <span>WhatsApp Enquiry</span>
+              </a>
+              
+              <button
+                onClick={handleShare}
+                className="sm:w-auto w-full flex items-center justify-center gap-2 btn-outline border-neutral-300 text-neutral-700 hover:bg-neutral-100 hover:border-neutral-400 py-4 px-8"
+              >
+                <ShareIcon className="w-5 h-5" />
+                <span>Share</span>
+              </button>
+            </div>
 
+            {/* Specs & Features */}
+            {(product.specifications?.length > 0 || product.features?.length > 0) && (
+              <div className="space-y-6 pt-6">
                 {product.features?.length > 0 && (
-                  <div className="card p-6">
-                    <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
-                      <SparklesIcon className="h-5 w-5 mr-2 text-secondary-500" />
-                      Features
-                    </h3>
+                  <div>
+                    <Typography variant="h3" className="mb-4">Features</Typography>
                     <ul className="space-y-3">
-                      {product.features.map((feature, index) => (
-                        <li key={index} className="flex items-start text-sm text-gray-600">
-                          <div className="w-2 h-2 bg-gradient-to-r from-primary-500 to-secondary-500 rounded-full mr-3 mt-2 flex-shrink-0"></div>
-                          <span>{feature}</span>
+                      {product.features.map((feature, idx) => (
+                        <li key={idx} className="flex gap-3 text-neutral-700">
+                          <span className="w-1.5 h-1.5 rounded-full bg-primary-500 shrink-0 mt-2" />
+                          <Typography variant="body">{feature}</Typography>
                         </li>
                       ))}
                     </ul>
                   </div>
                 )}
+
+                {product.specifications?.length > 0 && (
+                  <div>
+                    <Typography variant="h3" className="mb-4">Specifications</Typography>
+                    <div className="bg-surface-warm rounded-xl border border-neutral-200/50 p-6">
+                      <dl className="grid grid-cols-1 gap-y-4 text-sm">
+                        {product.specifications.map((spec, idx) => (
+                          <div key={idx} className="flex justify-between border-b border-neutral-200/50 pb-4 last:pb-0 last:border-0">
+                            <Typography variant="body" color="muted" as="dt">{spec.name}</Typography>
+                            <Typography variant="body" weight="medium" as="dd" className="text-right pl-4">{spec.value}</Typography>
+                          </div>
+                        ))}
+                      </dl>
+                    </div>
+                  </div>
+                )}
               </div>
             )}
-
-            {/* Actions */}
-            <div className="flex space-x-4 pt-6 border-t border-gray-200">
-              <button
-                onClick={handleShare}
-                className="flex items-center space-x-2 px-6 py-3 rounded-xl bg-white border-2 border-gray-200 text-gray-600 font-medium hover:border-primary-300 hover:text-primary-600 transition-all duration-300 shadow-soft hover:shadow-medium transform hover:-translate-y-0.5"
-              >
-                <ShareIcon className="h-5 w-5" />
-                <span>Share</span>
-              </button>
-            </div>
-
-            {/* Additional Info */}
-            <div className="card p-6 bg-gradient-to-r from-primary-50 to-secondary-50 border border-primary-100">
-              <div className="flex items-start space-x-3">
-                <InformationCircleIcon className="h-6 w-6 text-primary-600 mt-1" />
-                <div className="text-sm">
-                  <p className="font-semibold text-primary-800 mb-2">Product Information</p>
-                  <ul className="space-y-1 text-primary-700">
-                    {product.sku && <li><span className="font-medium">SKU:</span> {product.sku}</li>}
-                    {product.weight && <li><span className="font-medium">Weight:</span> {product.weight}g</li>}
-                  </ul>
-                </div>
-              </div>
-            </div>
           </div>
         </div>
 
         {/* Related Products */}
         {relatedProducts.length > 0 && (
-          <section>
-            <div className="mb-8 text-center">
-              <h2 className="text-3xl font-bold text-gray-900 mb-2">
-                You might also <span className="gradient-text">love these</span>
-              </h2>
-              <p className="text-gray-600">More amazing products from the same category</p>
+          <section className="pt-10 border-t border-neutral-200/50 animate-fade-up" style={{ animationDelay: '200ms' }}>
+            <div className="mb-8 flex justify-between items-end">
+              <div>
+                <Typography variant="h2" className="mb-2">You might also love</Typography>
+                <Typography variant="body" color="secondary">More amazing products from the same category</Typography>
+              </div>
             </div>
             
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
-              {relatedProducts.map((relatedProduct, index) => (
-                <div key={relatedProduct._id} style={{ animationDelay: `${index * 0.1}s` }}>
-                  <Link
-                    to={`/product/${relatedProduct.slug}`}
-                    className="group card card-hover animate-fade-in block"
-                  >
-                    <div className="aspect-w-1 aspect-h-1 w-full overflow-hidden bg-gradient-to-br from-warm-100 to-primary-100">
-                      <img
-                        src={relatedProduct.image?.url || relatedProduct.images?.[0]?.url}
-                        alt={relatedProduct.name}
-                        className="h-48 w-full object-contain object-center group-hover:scale-110 transition-transform duration-500"
-                      />
-                    </div>
-                    <div className="p-6">
-                      <h3 className="text-lg font-semibold text-gray-900 group-hover:text-primary-600 transition-colors line-clamp-2 mb-3">
-                        {relatedProduct.name}
-                      </h3>
-                      <div className="flex items-center justify-between">
-                        <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-gradient-to-r from-accent-100 to-secondary-100 text-accent-700 capitalize">
-                          {relatedProduct.tag}
-                        </span>
-                        <span className="text-primary-600 group-hover:text-primary-800 font-medium text-sm flex items-center">
-                          View
-                          <svg className="w-4 h-4 ml-1 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                          </svg>
-                        </span>
-                      </div>
-                    </div>
-                  </Link>
-                </div>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
+              {relatedProducts.map((p, idx) => (
+                <ProductCard key={p._id} product={p} />
               ))}
             </div>
           </section>
         )}
       </main>
 
-      {/* Footer */}
       <Footer />
     </div>
   );
 };
 
-export default ProductDetail; 
+export default ProductDetail;
