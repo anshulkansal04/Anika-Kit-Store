@@ -12,7 +12,7 @@ const SiteHeader = ({ back = false, crumbs = [] }) => {
       <div className="mx-auto flex max-w-7xl items-center gap-3 px-4 py-3 sm:px-6 sm:py-4 lg:px-8">
         <Link
           to="/"
-          className="flex items-center gap-2 flex-shrink-0 transition-opacity duration-200 hover:opacity-80"
+          className="flex flex-shrink-0 items-center gap-2 transition-opacity duration-200 hover:opacity-80"
           aria-label="Anika Kit Store home"
         >
           {back && <ArrowLeftIcon className="h-4 w-4 text-brand-600" />}
@@ -25,7 +25,7 @@ const SiteHeader = ({ back = false, crumbs = [] }) => {
             fetchPriority="high"
           />
           {!back && (
-            <span className="font-display text-base font-semibold text-brand-800 sm:text-lg">
+            <span className="font-display text-base font-semibold tracking-tight text-brand-800 sm:text-lg">
               Anika Kit Store
             </span>
           )}
