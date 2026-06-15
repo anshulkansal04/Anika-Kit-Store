@@ -5,41 +5,87 @@
 @layer base {
   html {
     font-family: 'Inter', system-ui, sans-serif;
+    scroll-behavior: smooth;
   }
-  
+
   body {
-    @apply bg-gradient-to-br from-warm-50 to-primary-50;
+    @apply bg-cream-50 text-stone-700;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+  }
+
+  h1, h2, h3, h4 {
+    @apply font-display;
+    font-optical-sizing: auto;
+  }
+
+  ::selection {
+    @apply bg-brand-200 text-brand-900;
   }
 }
 
 @layer components {
   .btn-primary {
-    @apply bg-primary-500 hover:bg-primary-600 text-white font-medium px-6 py-3 rounded-xl transition-all duration-300 shadow-soft hover:shadow-medium transform hover:-translate-y-0.5;
+    @apply inline-flex items-center justify-center gap-2 bg-brand-700 hover:bg-brand-800 text-cream-50 font-medium px-6 py-3 rounded-full transition-all duration-200 ease-out-quart shadow-soft hover:shadow-medium active:scale-[0.98];
   }
-  
+
   .btn-secondary {
-    @apply bg-secondary-500 hover:bg-secondary-600 text-white font-medium px-6 py-3 rounded-xl transition-all duration-300 shadow-soft hover:shadow-medium transform hover:-translate-y-0.5;
+    @apply inline-flex items-center justify-center gap-2 bg-cream-100 hover:bg-cream-200 text-brand-800 font-medium px-6 py-3 rounded-full transition-all duration-200 ease-out-quart border border-cream-200 active:scale-[0.98];
   }
-  
+
   .btn-outline {
-    @apply border-2 border-primary-500 text-primary-500 hover:bg-primary-500 hover:text-white font-medium px-6 py-3 rounded-xl transition-all duration-300 transform hover:-translate-y-0.5;
+    @apply inline-flex items-center justify-center gap-2 border border-brand-300 text-brand-700 hover:bg-brand-50 font-medium px-6 py-3 rounded-full transition-all duration-200 ease-out-quart active:scale-[0.98];
   }
-  
+
   .card {
-    @apply bg-white rounded-2xl shadow-soft hover:shadow-medium transition-all duration-300 overflow-hidden;
+    @apply bg-white rounded-2xl border border-cream-200 shadow-soft transition-all duration-300 ease-out-quart overflow-hidden;
   }
-  
+
   .card-hover {
-    @apply transform hover:-translate-y-1 hover:shadow-large;
+    @apply hover:-translate-y-0.5 hover:shadow-medium hover:border-cream-300;
   }
-  
+
+  /* Kept for backward compatibility: now a solid, elegant brand color (no gradient) */
   .gradient-text {
-    @apply bg-gradient-to-r from-primary-500 to-secondary-500 bg-clip-text text-transparent;
+    @apply text-brand-700;
   }
-  
+
   .glass-effect {
-    @apply bg-white/80 backdrop-blur-sm border border-white/20;
+    @apply bg-cream-50/85 backdrop-blur-md border-cream-200;
+  }
+
+  .eyebrow {
+    @apply text-[11px] font-semibold uppercase tracking-[0.16em] text-stone-400;
+  }
+}
+
+@layer utilities {
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  /* Reserve space for the floating mobile tab bar */
+  .pb-mobile-nav {
+    padding-bottom: calc(5.5rem + env(safe-area-inset-bottom));
+  }
+  @screen md {
+    .pb-mobile-nav {
+      padding-bottom: 0;
+    }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
 }

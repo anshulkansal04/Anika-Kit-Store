@@ -86,28 +86,6 @@
   outline-offset: 2px;
 }
 
-/* Button hover effects */
-.btn-primary {
-  background-color: #3b82f6;
-  color: white;
-  transition: all 0.2s;
-}
-
-.btn-primary:hover {
-  background-color: #2563eb;
-  transform: translateY(-1px);
-}
-
-.btn-secondary {
-  background-color: #6b7280;
-  color: white;
-  transition: all 0.2s;
-}
-
-.btn-secondary:hover {
-  background-color: #4b5563;
-}
-
 /* Loading states */
 .loading-shimmer {
   background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);

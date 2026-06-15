@@ -4,6 +4,26 @@ export default {
   theme: {
     extend: {
       colors: {
+        // Editorial brand palette: deep forest green + warm cream
+        brand: {
+          50: '#f3f7f4',
+          100: '#e2ece6',
+          200: '#c4d8cc',
+          300: '#9bbcaa',
+          400: '#6d9a82',
+          500: '#4a7c63',
+          600: '#37614e',
+          700: '#2c5040',
+          800: '#264235',
+          900: '#21372d',
+        },
+        cream: {
+          50: '#faf8f2',
+          100: '#f5f1e8',
+          200: '#ece5d6',
+          300: '#ddd4bf',
+          400: '#c9bc9f',
+        },
         primary: {
           50: '#fef7f0',
           100: '#fdede0',
@@ -66,14 +86,19 @@ export default {
         }
       },
       fontFamily: {
-        'display': ['Inter', 'system-ui', 'sans-serif'],
+        'display': ['Fraunces', 'Georgia', 'serif'],
         'body': ['Inter', 'system-ui', 'sans-serif'],
+      },
+      transitionTimingFunction: {
+        'out-quart': 'cubic-bezier(0.25, 1, 0.5, 1)',
+        'out-expo': 'cubic-bezier(0.16, 1, 0.3, 1)',
       },
       animation: {
         'bounce-gentle': 'bounce-gentle 2s infinite',
         'fade-in': 'fade-in 0.5s ease-out',
         'slide-up': 'slide-up 0.6s ease-out',
         'scale-in': 'scale-in 0.3s ease-out',
+        'fade-up': 'fade-up 0.5s cubic-bezier(0.16, 1, 0.3, 1) both',
       },
       keyframes: {
         'bounce-gentle': {
@@ -92,11 +117,16 @@ export default {
           '0%': { opacity: '0', transform: 'scale(0.95)' },
           '100%': { opacity: '1', transform: 'scale(1)' },
         },
+        'fade-up': {
+          '0%': { opacity: '0', transform: 'translateY(12px)' },
+          '100%': { opacity: '1', transform: 'translateY(0)' },
+        },
       },
       boxShadow: {
-        'soft': '0 2px 15px -3px rgba(0, 0, 0, 0.07), 0 10px 20px -2px rgba(0, 0, 0, 0.04)',
-        'medium': '0 4px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
-        'large': '0 10px 50px -12px rgba(0, 0, 0, 0.15)',
+        'soft': '0 1px 2px rgba(38, 66, 53, 0.04), 0 8px 24px -12px rgba(38, 66, 53, 0.12)',
+        'medium': '0 2px 4px rgba(38, 66, 53, 0.05), 0 16px 32px -16px rgba(38, 66, 53, 0.16)',
+        'large': '0 24px 48px -20px rgba(38, 66, 53, 0.22)',
+        'nav': '0 -6px 24px -10px rgba(38, 66, 53, 0.18)',
       },
     },
   },
