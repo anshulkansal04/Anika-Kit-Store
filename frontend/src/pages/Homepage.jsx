@@ -152,7 +152,7 @@ const Homepage = () => {
             </div>
 
             {searchResults.length > 0 ? (
-              <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 sm:gap-6 lg:grid-cols-4">
+              <div className="grid grid-cols-2 gap-2.5 xs:gap-4 sm:grid-cols-3 sm:gap-6 lg:grid-cols-4">
                 {searchResults.map((product, index) => (
                   <ItemCard
                     key={product._id}
@@ -189,13 +189,13 @@ const Homepage = () => {
             </div>
 
             {categories.length > 0 ? (
-              <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 sm:gap-6 lg:grid-cols-4">
+              <div className="grid grid-cols-2 gap-2.5 xs:gap-4 sm:grid-cols-3 sm:gap-6 lg:grid-cols-4">
                 {categories.map((category, index) => (
                   <CategoryCard key={category._id} category={category} index={index} />
                 ))}
               </div>
             ) : (
-              <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 sm:gap-6 lg:grid-cols-4">
+              <div className="grid grid-cols-2 gap-2.5 xs:gap-4 sm:grid-cols-3 sm:gap-6 lg:grid-cols-4">
                 {Array.from({ length: 8 }).map((_, i) => (
                   <ItemCardSkeleton key={i} />
                 ))}

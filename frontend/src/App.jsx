@@ -7,12 +7,14 @@ const ProductDetail = lazy(() => import('./pages/ProductDetail'));
 const AdminLogin = lazy(() => import('./pages/AdminLogin'));
 const AdminDashboard = lazy(() => import('./pages/AdminDashboard'));
 import { AuthProvider } from './context/AuthContext';
+import ScrollToTop from './components/ScrollToTop';
 import './App.css';
 
 function App() {
   return (
     <AuthProvider>
       <Router>
+        <ScrollToTop />
         <div className="App">
           <Suspense fallback={<div style={{minHeight:'50vh'}} /> }>
             <Routes>

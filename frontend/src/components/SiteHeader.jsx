@@ -24,9 +24,11 @@ const SiteHeader = ({ back = false, crumbs = [] }) => {
             className="h-8 w-auto sm:h-9"
             fetchPriority="high"
           />
-          <span className="hidden font-display text-base font-semibold text-brand-800 sm:inline sm:text-lg">
-            Anika Kit Store
-          </span>
+          {!back && (
+            <span className="font-display text-base font-semibold text-brand-800 sm:text-lg">
+              Anika Kit Store
+            </span>
+          )}
         </Link>
 
         {crumbs.length > 0 && (

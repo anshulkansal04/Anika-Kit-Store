@@ -22,8 +22,8 @@ const ItemCard = ({ to, imageUrl, label, title, priority = false, index = 0 }) =
       className="group block animate-fade-up active:scale-[0.99] transition-transform duration-200 ease-out-quart"
       style={{ animationDelay: `${Math.min(index, 8) * 45}ms` }}
     >
-      <article className="card card-hover h-full">
-        <div className="relative overflow-hidden rounded-xl m-2.5 sm:m-3 border border-cream-200 bg-cream-100 aspect-[4/5]">
+      <article className="card card-hover h-full !rounded-xl xs:!rounded-2xl">
+        <div className="relative overflow-hidden rounded-lg xs:rounded-xl m-1.5 xs:m-2.5 sm:m-3 border border-cream-200 bg-cream-100 aspect-[4/5]">
           {!imageLoaded && (
             <div className="absolute inset-0 animate-pulse bg-cream-200/60" aria-hidden="true" />
           )}
@@ -46,13 +46,13 @@ const ItemCard = ({ to, imageUrl, label, title, priority = false, index = 0 }) =
           )}
         </div>
 
-        <div className="px-4 pb-4 pt-1.5 sm:px-5 sm:pb-5">
+        <div className="px-2.5 pb-3 pt-1 xs:px-4 xs:pb-4 xs:pt-1.5 sm:px-5 sm:pb-5">
           {label && (
-            <p className="eyebrow truncate" title={label}>
+            <p className="eyebrow truncate text-[10px] xs:text-[11px]" title={label}>
               {label}
             </p>
           )}
-          <h3 className="mt-1.5 font-display text-base sm:text-lg leading-snug text-brand-700 line-clamp-2 transition-colors duration-200 group-hover:text-brand-800">
+          <h3 className="mt-1 xs:mt-1.5 font-display text-[13px] xs:text-base sm:text-lg leading-snug text-brand-700 line-clamp-2 transition-colors duration-200 group-hover:text-brand-800">
             {title}
           </h3>
         </div>
@@ -61,13 +61,21 @@ const ItemCard = ({ to, imageUrl, label, title, priority = false, index = 0 }) =
   );
 };
 
+const ShimmerLine = ({ className }) => (
+  <div className={`relative overflow-hidden bg-cream-200/50 ${className}`}>
+    <div className="absolute inset-0 -translate-x-full animate-shimmer bg-gradient-to-r from-cream-200/0 via-cream-100/80 to-cream-200/0" />
+  </div>
+);
+
 export const ItemCardSkeleton = () => (
-  <div className="card h-full" aria-hidden="true">
-    <div className="m-2.5 sm:m-3 rounded-xl border border-cream-200 bg-cream-100 aspect-[4/5] animate-pulse" />
-    <div className="px-4 pb-4 pt-1.5 sm:px-5 sm:pb-5">
-      <div className="h-2.5 w-1/3 rounded-full bg-cream-200" />
-      <div className="mt-3 h-4 w-4/5 rounded-full bg-cream-200" />
-      <div className="mt-2 h-4 w-2/5 rounded-full bg-cream-200" />
+  <div className="card h-full !rounded-xl xs:!rounded-2xl" aria-hidden="true">
+    <div className="m-1.5 xs:m-2.5 sm:m-3 rounded-lg xs:rounded-xl border border-cream-200 overflow-hidden aspect-[4/5]">
+      <ShimmerLine className="h-full w-full" />
+    </div>
+    <div className="px-2.5 pb-3 pt-1 xs:px-4 xs:pb-4 xs:pt-1.5 sm:px-5 sm:pb-5">
+      <ShimmerLine className="h-2 xs:h-2.5 w-1/3 rounded-full" />
+      <ShimmerLine className="mt-2 xs:mt-3 h-3.5 xs:h-4 w-4/5 rounded-full" />
+      <ShimmerLine className="mt-1.5 xs:mt-2 h-3.5 xs:h-4 w-2/5 rounded-full" />
     </div>
   </div>
 );

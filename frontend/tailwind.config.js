@@ -3,6 +3,11 @@ export default {
   content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
   theme: {
     extend: {
+      screens: {
+        // Extra-small breakpoint for tightening mobile grids/cards
+        // below typical phablet width (e.g. iPhone SE / small Androids).
+        xs: '500px',
+      },
       colors: {
         // Editorial brand palette: deep forest green + warm cream
         brand: {
@@ -99,8 +104,13 @@ export default {
         'slide-up': 'slide-up 0.6s ease-out',
         'scale-in': 'scale-in 0.3s ease-out',
         'fade-up': 'fade-up 0.5s cubic-bezier(0.16, 1, 0.3, 1) both',
+        'shimmer': 'shimmer 1.8s infinite',
       },
       keyframes: {
+        'shimmer': {
+          '0%': { transform: 'translateX(-100%)' },
+          '100%': { transform: 'translateX(100%)' },
+        },
         'bounce-gentle': {
           '0%, 100%': { transform: 'translateY(0)' },
           '50%': { transform: 'translateY(-10px)' },
